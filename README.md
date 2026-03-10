@@ -1,2 +1,2 @@
-# fase-1-spring-explorer
+# fase-1
 Sistema de Gerenciamento de Usuários - Tech Challenge FIAP
