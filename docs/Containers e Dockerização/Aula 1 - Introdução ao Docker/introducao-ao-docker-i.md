@@ -1,6 +1,6 @@
-# Docker e Containers — Resumo para Estudo
+# 🐳 Docker e Containers — Resumo para Estudo
 
-## 1. Problema no desenvolvimento tradicional
+## 1. ⚠️ Problema no desenvolvimento tradicional
 Um dos principais problemas no desenvolvimento de software é o uso excessivo de recursos da máquina, como:
 
 - CPU
@@ -21,7 +21,7 @@ Isso gera problemas como:
 
 ---
 
-## 2. Uso de máquinas virtuais (VM)
+## 2. 💻 Uso de máquinas virtuais (VM)
 
 Antes dos containers, uma solução comum era utilizar **máquinas virtuais**.
 
@@ -40,7 +40,7 @@ Isso torna o ambiente pesado e pouco eficiente quando precisamos rodar várias a
 
 ---
 
-## 3. Containers
+## 3. 📦 Containers
 
 Os **containers** surgiram para resolver esses problemas.
 
@@ -66,7 +66,7 @@ Se um container apresentar problema:
 
 ---
 
-## 4. Docker
+## 4. 🐳 Docker
 
 O **Docker** é a ferramenta responsável por **gerenciar containers**.
 
@@ -81,11 +81,11 @@ Com Docker podemos criar ambientes **padronizados e reproduzíveis** para execut
 
 ---
 
-## 5. Base do Docker no Linux
+## 5. 🐧 Base do Docker no Linux
 
 Docker utiliza recursos do **sistema Linux** para funcionar.
 
-### Kernel
+### ⚙️ Kernel
 
 O **Kernel** é o núcleo do sistema operacional.
 
@@ -98,7 +98,7 @@ Docker usa o kernel do Linux para gerenciar processos e recursos.
 
 ---
 
-### Cgroups (Control Groups)
+### 🎛️ Cgroups (Control Groups)
 
 Os **Cgroups** são responsáveis por **controlar o uso de recursos**.
 
@@ -112,7 +112,7 @@ Assim cada container usa apenas os recursos definidos.
 
 ---
 
-### Namespaces
+### 🔒 Namespaces
 
 Os **Namespaces** fazem o **isolamento dos processos**.
 
@@ -131,7 +131,7 @@ Se um usuário for criado dentro de um container:
 
 ---
 
-## 6. Docker no Windows
+## 6. 🪟 Docker no Windows
 
 Docker foi criado para **Linux**.
 
@@ -147,7 +147,7 @@ Vantagens:
 
 ---
 
-## 7. Instalação do WSL
+## 7. 📥 Instalação do WSL
 
 A instalação pode ser feita pelo **PowerShell como administrador**.
 
@@ -165,7 +165,7 @@ Esse comando instala automaticamente:
 
 ---
 
-## 8. Distribuições Linux disponíveis
+## 8. 🐧 Distribuições Linux disponíveis
 
 Exemplos disponíveis no WSL:
 
@@ -187,7 +187,7 @@ wsl --install -d Debian
 
 ---
 
-## 9. Versões do WSL
+## 9. 🔢 Versões do WSL
 
 ### WSL 1
 
@@ -204,7 +204,7 @@ Docker **funciona apenas com WSL 2**.
 
 ---
 
-## 10. Instalação do Docker
+## 10. 🚀 Instalação do Docker
 
 Passos básicos:
 
@@ -217,7 +217,7 @@ Depois disso Docker passa a usar o ambiente Linux para **executar e gerenciar co
 
 ---
 
-## Ideia principal da aula
+## 💡 Ideia principal da aula
 
 Docker foi criado para:
 
