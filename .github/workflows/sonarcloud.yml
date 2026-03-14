@@ -52,16 +52,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  deploy:
-    name: Deploy to Render
-    needs: sonarcloud
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
-    steps:
-      - name: Trigger Render Deploy
-        run: |
-          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
-      
-      - name: Deployment Status
-        run: echo "✅ Deploy triggered on Render.com"
+  # deploy:
+  #   Será configurado após setup do Render.com (TASK-031)
