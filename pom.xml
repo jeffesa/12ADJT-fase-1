@@ -57,6 +57,13 @@
             <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- SIMULAÇÃO: dependência vulnerável para teste do pipeline -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.14.1</version>
+        </dependency>
         
         <!-- Lombok (opcional, facilita código) -->
         <dependency>
