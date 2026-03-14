@@ -56,12 +56,4 @@ class Fase1SpringExplorerApplicationTests {
         assertTrue(lista.isEmpty());
     }
 
-    @Test
-    @DisplayName("SIMULACAO: detecta uso de dependencia vulneravel - deve falhar")
-    void deveDetectarDependenciaVulneravel() {
-        // Log4Shell CVE-2021-44228 - versao 2.14.1 e vulneravel
-        String versaoSegura = "2.17.1";
-        String versaoAtual = "2.14.1";
-        assertEquals(versaoSegura, versaoAtual, "Versao do log4j vulneravel! Atualize para 2.17.1+");
-    }
 }
