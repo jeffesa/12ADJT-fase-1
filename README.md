@@ -494,13 +494,28 @@ GET http://localhost:8080/actuator/health
 
 ## 🐳 Docker
 
+### Subir banco de dados para desenvolvimento
+
+```bash
+# Sobe apenas o PostgreSQL em background
+docker-compose up -d postgres
+
+# Verificar se está rodando
+docker-compose ps
+
+# Parar o banco
+docker-compose down
+```
+
+Após subir o banco, rode a aplicação pelo IntelliJ com o profile `dev`.
+
 ### Build da Imagem
 
 ```bash
 docker build -t fase-1-spring-explorer .
 ```
 
-### Executar com Docker Compose
+### Executar com Docker Compose completo
 
 ```bash
 docker-compose up
