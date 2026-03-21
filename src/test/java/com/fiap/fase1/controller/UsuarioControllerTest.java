@@ -47,7 +47,7 @@ class UsuarioControllerTest {
 
     @BeforeEach
     void setUp() {
-        Usuario usuario = new Usuario("João Silva", "joao@email.com", "senha_hash");
+        Usuario usuario = new Usuario("João Silva", "joao@email.com", "joaosilva", "senha_hash");
         try {
             var field = Usuario.class.getDeclaredField("id");
             field.setAccessible(true);
@@ -59,6 +59,7 @@ class UsuarioControllerTest {
         requestDTO = new UsuarioRequestDTO();
         requestDTO.setNome("João Silva");
         requestDTO.setEmail("joao@email.com");
+        requestDTO.setLogin("joaosilva");
         requestDTO.setSenha("senha123");
     }
 
