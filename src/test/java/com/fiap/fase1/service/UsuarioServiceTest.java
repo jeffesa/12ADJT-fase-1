@@ -46,7 +46,9 @@ class UsuarioServiceTest {
             var field = Usuario.class.getDeclaredField("id");
             field.setAccessible(true);
             field.set(usuario, 1L);
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            throw new RuntimeException("Falha ao setar id via reflection", e);
+        }
 
         requestDTO = new UsuarioRequestDTO();
         requestDTO.setNome("João Silva");
