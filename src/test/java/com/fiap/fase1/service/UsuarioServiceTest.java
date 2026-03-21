@@ -41,7 +41,7 @@ class UsuarioServiceTest {
 
     @BeforeEach
     void setUp() {
-        usuario = new Usuario("João Silva", "joao@email.com", "senha_hash");
+        usuario = new Usuario("João Silva", "joao@email.com", "joaosilva", "senha_hash");
         try {
             var field = Usuario.class.getDeclaredField("id");
             field.setAccessible(true);
@@ -51,6 +51,7 @@ class UsuarioServiceTest {
         requestDTO = new UsuarioRequestDTO();
         requestDTO.setNome("João Silva");
         requestDTO.setEmail("joao@email.com");
+        requestDTO.setLogin("joaosilva");
         requestDTO.setSenha("senha123");
     }
 
