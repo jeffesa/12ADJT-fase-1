@@ -1,0 +1,17 @@
+name: fiap-fase-1
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: fiap-fase1-postgres
+    environment:
+      POSTGRES_DB: fiap_fase1
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - fiap_fase1_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  fiap_fase1_postgres_data:

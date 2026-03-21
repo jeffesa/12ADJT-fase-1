@@ -27,7 +27,7 @@ public class UsuarioService {
         if (repository.existsByEmail(dto.getEmail())) {
             throw new EmailJaCadastradoException(dto.getEmail());
         }
-        Usuario usuario = new Usuario(dto.getNome(), dto.getEmail(), passwordEncoder.encode(dto.getSenha()));
+        Usuario usuario = new Usuario(dto.getNome(), dto.getEmail(), dto.getLogin(), passwordEncoder.encode(dto.getSenha()));
         return new UsuarioResponseDTO(repository.save(usuario));
     }
 
@@ -43,6 +43,7 @@ public class UsuarioService {
         Usuario usuario = repository.findById(id).orElseThrow(() -> new UsuarioNaoEncontradoException(id));
         usuario.setNome(dto.getNome());
         usuario.setEmail(dto.getEmail());
+        usuario.setLogin(dto.getLogin());
         usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
         return new UsuarioResponseDTO(repository.save(usuario));
     }
