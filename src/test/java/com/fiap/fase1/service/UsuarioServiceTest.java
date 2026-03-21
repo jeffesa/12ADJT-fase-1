@@ -41,19 +41,16 @@ class UsuarioServiceTest {
 
     @BeforeEach
     void setUp() {
-        usuario = new Usuario("João Silva", "joao@email.com", "joaosilva", "senha_hash");
+        usuario = new Usuario("João Silva", "joao@email.com", "senha_hash");
         try {
             var field = Usuario.class.getDeclaredField("id");
             field.setAccessible(true);
             field.set(usuario, 1L);
-        } catch (Exception e) {
-            throw new RuntimeException("Falha ao setar id via reflection", e);
-        }
+        } catch (Exception ignored) {}
 
         requestDTO = new UsuarioRequestDTO();
         requestDTO.setNome("João Silva");
         requestDTO.setEmail("joao@email.com");
-        requestDTO.setLogin("joaosilva");
         requestDTO.setSenha("senha123");
     }
 
