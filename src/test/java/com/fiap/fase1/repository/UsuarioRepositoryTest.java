@@ -19,11 +19,9 @@ class UsuarioRepositoryTest {
     @Autowired
     private UsuarioRepository repository;
 
-    private Usuario usuario;
-
     @BeforeEach
     void setUp() {
-        usuario = repository.save(new Usuario("João Silva", "joao@email.com", "joaosilva", "senha_hash"));
+        repository.save(new Usuario("João Silva", "joao@email.com", "joaosilva", "senha_hash"));
     }
 
     @Test
