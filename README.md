@@ -339,6 +339,9 @@ A aplicação estará disponível em: **[http://localhost:8080](http://localhost
     -   Local repository: `~/.m2/repository`
 4.  Clique **OK**
 
+> ⚠️ **Importante:** O projeto requer **Java 17** para rodar os testes localmente. O JaCoCo 0.8.11 é incompatível com Java 21+. Certifique-se de que o JDK configurado no Maven Runner também é o 17:
+> **Settings → Build, Execution, Deployment → Build Tools → Maven → Runner → JRE: 17**
+
 #### 4. Habilitar Annotation Processing
 
 1.  **Settings → Build, Execution, Deployment → Compiler → Annotation Processors**
@@ -371,6 +374,15 @@ mvn clean install
 
 # No IntelliJ: File → Invalidate Caches → Invalidate and Restart
 ```
+
+#### Erro: "Unsupported class file major version" no JaCoCo
+
+**Causa:** JaCoCo 0.8.11 é incompatível com Java 21+
+
+**Solução:**
+
+-   Configure o Maven Runner para usar Java 17: **Settings → Build Tools → Maven → Runner → JRE: 17**
+-   Ou rode os testes pulando o JaCoCo: `mvn test -Djacoco.skip=true`
 
 #### Erro: "java.lang.ExceptionInInitializerError"
 
@@ -482,13 +494,28 @@ GET http://localhost:8080/actuator/health
 
 ## 🐳 Docker
 
+### Subir banco de dados para desenvolvimento
+
+```bash
+# Sobe apenas o PostgreSQL em background
+docker-compose up -d postgres
+
+# Verificar se está rodando
+docker-compose ps
+
+# Parar o banco
+docker-compose down
+```
+
+Após subir o banco, rode a aplicação pelo IntelliJ com o profile `dev`.
+
 ### Build da Imagem
 
 ```bash
 docker build -t fase-1-spring-explorer .
 ```
 
-### Executar com Docker Compose
+### Executar com Docker Compose completo
 
 ```bash
 docker-compose up
