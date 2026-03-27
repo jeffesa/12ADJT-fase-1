@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -47,22 +48,8 @@ class UsuarioControllerTest {
 
     @BeforeEach
     void setUp() {
-        Usuario usuario = new Usuario("João Silva", "joao@email.com", "joaosilva", "senha_hash");
-        try {
-            var field = Usuario.class.getDeclaredField("id");
-            field.setAccessible(true);
-            field.set(usuario, 1L);
-        } catch (Exception e) {
-            throw new RuntimeException("Falha ao setar id via reflection", e);
-        }
-
-        responseDTO = new UsuarioResponseDTO(usuario);
-
-        requestDTO = new UsuarioRequestDTO();
-        requestDTO.setNome("João Silva");
-        requestDTO.setEmail("joao@email.com");
-        requestDTO.setLogin("joaosilva");
-        requestDTO.setSenha("senha123");
+        responseDTO = new UsuarioResponseDTO(1L, "João Silva", "joao@email.com", "joaosilva", LocalDateTime.now());
+        requestDTO = new UsuarioRequestDTO("João Silva", "joao@email.com", "joaosilva", "senha123");
     }
 
     @Test
@@ -92,10 +79,7 @@ class UsuarioControllerTest {
     @Test
     @DisplayName("POST /api/usuarios - deve retornar 400 com dados inválidos")
     void deveRetornar400DadosInvalidos() throws Exception {
-        UsuarioRequestDTO invalido = new UsuarioRequestDTO();
-        invalido.setNome("");
-        invalido.setEmail("email-invalido");
-        invalido.setSenha("123");
+        UsuarioRequestDTO invalido = new UsuarioRequestDTO("", "email-invalido", "login", "123");
 
         mockMvc.perform(post("/api/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -174,9 +158,7 @@ class UsuarioControllerTest {
     @Test
     @DisplayName("POST /api/usuarios/login - deve realizar login e retornar 200")
     void deveRealizarLogin() throws Exception {
-        LoginRequestDTO loginDTO = new LoginRequestDTO();
-        loginDTO.setEmail("joao@email.com");
-        loginDTO.setSenha("senha123");
+        LoginRequestDTO loginDTO = new LoginRequestDTO("joaosilva", "senha123");
 
         when(service.login(any())).thenReturn(responseDTO);
 
@@ -190,9 +172,7 @@ class UsuarioControllerTest {
     @Test
     @DisplayName("POST /api/usuarios/login - deve retornar 401 com credenciais inválidas")
     void deveRetornar401CredenciaisInvalidas() throws Exception {
-        LoginRequestDTO loginDTO = new LoginRequestDTO();
-        loginDTO.setEmail("joao@email.com");
-        loginDTO.setSenha("senhaErrada");
+        LoginRequestDTO loginDTO = new LoginRequestDTO("joaosilva", "senhaErrada");
 
         when(service.login(any())).thenThrow(new IllegalArgumentException("Email ou senha inválidos"));
 
