@@ -1,0 +1,89 @@
+{
+  "info": {
+    "name": "FIAP Fase 1 - Usuarios",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "Criar Usuario",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/usuarios",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"João Silva\",\n  \"email\": \"joao@email.com\",\n  \"login\": \"joaosilva\",\n  \"senha\": \"senha123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Listar Usuarios",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/usuarios",
+        "header": []
+      }
+    },
+    {
+      "name": "Buscar Usuario por ID",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/usuarios/1",
+        "header": []
+      }
+    },
+    {
+      "name": "Atualizar Usuario",
+      "request": {
+        "method": "PUT",
+        "url": "{{baseUrl}}/api/usuarios/1",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"João Atualizado\",\n  \"email\": \"joao@email.com\",\n  \"login\": \"joaosilva\",\n  \"senha\": \"novaSenha123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Deletar Usuario",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/api/usuarios/1",
+        "header": []
+      }
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/usuarios/login",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"joao@email.com\",\n  \"senha\": \"senha123\"\n}"
+        }
+      }
+    }
+  ]
+}
