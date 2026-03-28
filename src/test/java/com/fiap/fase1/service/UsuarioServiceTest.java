@@ -3,7 +3,9 @@ package com.fiap.fase1.service;
 import com.fiap.fase1.dto.LoginRequestDTO;
 import com.fiap.fase1.dto.UsuarioRequestDTO;
 import com.fiap.fase1.dto.UsuarioResponseDTO;
+import com.fiap.fase1.exception.CredenciaisInvalidasException;
 import com.fiap.fase1.exception.EmailJaCadastradoException;
+import com.fiap.fase1.exception.UsuarioNaoEncontradoException;
 import com.fiap.fase1.model.Usuario;
 import com.fiap.fase1.repository.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -108,7 +110,7 @@ class UsuarioServiceTest {
     void deveLancarExcecaoIdInexistente() {
         when(repository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> service.buscarPorId(99L));
+        assertThrows(UsuarioNaoEncontradoException.class, () -> service.buscarPorId(99L));
     }
 
     @Test
@@ -129,7 +131,7 @@ class UsuarioServiceTest {
     void deveLancarExcecaoAoAtualizarInexistente() {
         when(repository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> service.atualizar(99L, requestDTO));
+        assertThrows(UsuarioNaoEncontradoException.class, () -> service.atualizar(99L, requestDTO));
     }
 
     @Test
@@ -147,7 +149,7 @@ class UsuarioServiceTest {
     void deveLancarExcecaoAoDeletarInexistente() {
         when(repository.existsById(99L)).thenReturn(false);
 
-        assertThrows(RuntimeException.class, () -> service.deletar(99L));
+        assertThrows(UsuarioNaoEncontradoException.class, () -> service.deletar(99L));
     }
 
     @Test
@@ -171,7 +173,7 @@ class UsuarioServiceTest {
 
         when(repository.findByLogin("naoexiste")).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> service.login(loginDTO));
+        assertThrows(CredenciaisInvalidasException.class, () -> service.login(loginDTO));
     }
 
     @Test
@@ -182,6 +184,6 @@ class UsuarioServiceTest {
         when(repository.findByLogin("joaosilva")).thenReturn(Optional.of(usuario));
         when(passwordEncoder.matches("senhaErrada", "senha_hash")).thenReturn(false);
 
-        assertThrows(RuntimeException.class, () -> service.login(loginDTO));
+        assertThrows(CredenciaisInvalidasException.class, () -> service.login(loginDTO));
     }
 }

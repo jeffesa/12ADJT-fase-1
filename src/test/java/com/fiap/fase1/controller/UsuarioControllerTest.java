@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.fase1.dto.LoginRequestDTO;
 import com.fiap.fase1.dto.UsuarioRequestDTO;
 import com.fiap.fase1.dto.UsuarioResponseDTO;
+import com.fiap.fase1.exception.CredenciaisInvalidasException;
 import com.fiap.fase1.exception.EmailJaCadastradoException;
 import com.fiap.fase1.exception.UsuarioNaoEncontradoException;
-import com.fiap.fase1.model.Usuario;
 import com.fiap.fase1.service.UsuarioService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -174,7 +174,7 @@ class UsuarioControllerTest {
     void deveRetornar401CredenciaisInvalidas() throws Exception {
         LoginRequestDTO loginDTO = new LoginRequestDTO("joaosilva", "senhaErrada");
 
-        when(service.login(any())).thenThrow(new IllegalArgumentException("Email ou senha inválidos"));
+        when(service.login(any())).thenThrow(new CredenciaisInvalidasException());
 
         mockMvc.perform(post("/api/usuarios/login")
                         .contentType(MediaType.APPLICATION_JSON)
