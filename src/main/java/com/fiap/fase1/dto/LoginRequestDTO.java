@@ -1,19 +1,11 @@
 package com.fiap.fase1.dto;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-public class LoginRequestDTO {
+public record LoginRequestDTO(
+    @NotBlank(message = "O login é obrigatório")
+    String login,
 
-    @Email(message = "Email inválido")
-    @NotBlank(message = "Email é obrigatório")
-    private String email;
-
-    @NotBlank(message = "Senha é obrigatória")
-    private String senha;
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getSenha() { return senha; }
-    public void setSenha(String senha) { this.senha = senha; }
-}
+    @NotBlank(message = "A senha é obrigatória")
+    String senha
+) {}
