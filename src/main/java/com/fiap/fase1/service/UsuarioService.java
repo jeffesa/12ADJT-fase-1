@@ -3,6 +3,7 @@ package com.fiap.fase1.service;
 import com.fiap.fase1.dto.LoginRequestDTO;
 import com.fiap.fase1.dto.UsuarioRequestDTO;
 import com.fiap.fase1.dto.UsuarioResponseDTO;
+import com.fiap.fase1.exception.CredenciaisInvalidasException;
 import com.fiap.fase1.exception.EmailJaCadastradoException;
 import com.fiap.fase1.exception.UsuarioNaoEncontradoException;
 import com.fiap.fase1.model.Usuario;
@@ -24,41 +25,50 @@ public class UsuarioService {
     }
 
     public UsuarioResponseDTO criar(UsuarioRequestDTO dto) {
-        if (repository.existsByEmail(dto.getEmail())) {
-            throw new EmailJaCadastradoException(dto.getEmail());
+        if (repository.existsByEmail(dto.email())) {
+            throw new EmailJaCadastradoException(dto.email());
         }
-        Usuario usuario = new Usuario(dto.getNome(), dto.getEmail(), dto.getLogin(), passwordEncoder.encode(dto.getSenha()));
-        return new UsuarioResponseDTO(repository.save(usuario));
+        Usuario usuario = new Usuario(dto.nome(), dto.email(), dto.login(), passwordEncoder.encode(dto.senha()));
+        return UsuarioResponseDTO.fromEntity(repository.save(usuario));
     }
 
     public List<UsuarioResponseDTO> listar() {
-        return repository.findAll().stream().map(UsuarioResponseDTO::new).toList();
+        return repository.findAll().stream().map(UsuarioResponseDTO::fromEntity).toList();
     }
 
     public UsuarioResponseDTO buscarPorId(Long id) {
-        return new UsuarioResponseDTO(repository.findById(id).orElseThrow(() -> new UsuarioNaoEncontradoException(id)));
+        return repository.findById(id)
+                .map(UsuarioResponseDTO::fromEntity)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException(id));
     }
 
     public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO dto) {
-        Usuario usuario = repository.findById(id).orElseThrow(() -> new UsuarioNaoEncontradoException(id));
-        usuario.setNome(dto.getNome());
-        usuario.setEmail(dto.getEmail());
-        usuario.setLogin(dto.getLogin());
-        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
-        return new UsuarioResponseDTO(repository.save(usuario));
+        Usuario usuario = repository.findById(id)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException(id));
+
+        usuario.setNome(dto.nome());
+        usuario.setEmail(dto.email());
+        usuario.setLogin(dto.login());
+        usuario.setSenha(passwordEncoder.encode(dto.senha()));
+
+        return UsuarioResponseDTO.fromEntity(repository.save(usuario));
     }
 
     public void deletar(Long id) {
-        if (!repository.existsById(id)) throw new UsuarioNaoEncontradoException(id);
+        if (!repository.existsById(id)) {
+            throw new UsuarioNaoEncontradoException(id);
+        }
         repository.deleteById(id);
     }
 
     public UsuarioResponseDTO login(LoginRequestDTO dto) {
-        Usuario usuario = repository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("Email ou senha inválidos"));
-        if (!passwordEncoder.matches(dto.getSenha(), usuario.getSenha())) {
-            throw new IllegalArgumentException("Email ou senha inválidos");
+        Usuario usuario = repository.findByLogin(dto.login())
+                .orElseThrow(CredenciaisInvalidasException::new);
+
+        if (!passwordEncoder.matches(dto.senha(), usuario.getSenha())) {
+            throw new CredenciaisInvalidasException();
         }
-        return new UsuarioResponseDTO(usuario);
+
+        return UsuarioResponseDTO.fromEntity(usuario);
     }
 }
