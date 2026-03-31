@@ -5,6 +5,7 @@ import com.fiap.fase1.dto.UsuarioRequestDTO;
 import com.fiap.fase1.dto.UsuarioResponseDTO;
 import com.fiap.fase1.exception.CredenciaisInvalidasException;
 import com.fiap.fase1.exception.EmailJaCadastradoException;
+import com.fiap.fase1.exception.LoginJaCadastradoException;
 import com.fiap.fase1.exception.UsuarioNaoEncontradoException;
 import com.fiap.fase1.model.Usuario;
 import com.fiap.fase1.repository.UsuarioRepository;
@@ -63,6 +64,7 @@ class UsuarioServiceTest {
     @DisplayName("Deve criar usuário com sucesso")
     void deveCriarUsuario() {
         when(repository.existsByEmail(requestDTO.email())).thenReturn(false);
+        when(repository.existsByLogin(requestDTO.login())).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("senha_hash");
         when(repository.save(any(Usuario.class))).thenReturn(usuario);
 
@@ -80,6 +82,16 @@ class UsuarioServiceTest {
         when(repository.existsByEmail(requestDTO.email())).thenReturn(true);
 
         assertThrows(EmailJaCadastradoException.class, () -> service.criar(requestDTO));
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao criar usuário com login já cadastrado")
+    void deveLancarExcecaoLoginDuplicado() {
+        when(repository.existsByEmail(requestDTO.email())).thenReturn(false);
+        when(repository.existsByLogin(requestDTO.login())).thenReturn(true);
+
+        assertThrows(LoginJaCadastradoException.class, () -> service.criar(requestDTO));
         verify(repository, never()).save(any());
     }
 
@@ -117,6 +129,8 @@ class UsuarioServiceTest {
     @DisplayName("Deve atualizar usuário com sucesso")
     void deveAtualizarUsuario() {
         when(repository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(repository.findByEmail(requestDTO.email())).thenReturn(Optional.of(usuario));
+        when(repository.findByLogin(requestDTO.login())).thenReturn(Optional.of(usuario));
         when(passwordEncoder.encode(anyString())).thenReturn("nova_senha_hash");
         when(repository.save(any(Usuario.class))).thenReturn(usuario);
 
@@ -124,6 +138,43 @@ class UsuarioServiceTest {
 
         assertNotNull(response);
         verify(repository).save(any(Usuario.class));
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao atualizar com email de outro usuário")
+    void deveLancarExcecaoAoAtualizarEmailDuplicado() {
+        Usuario outroUsuario = new Usuario("Outro", "joao@email.com", "outro", "hash");
+        try {
+            var field = Usuario.class.getDeclaredField("id");
+            field.setAccessible(true);
+            field.set(outroUsuario, 2L);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        when(repository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(repository.findByEmail(requestDTO.email())).thenReturn(Optional.of(outroUsuario));
+
+        assertThrows(EmailJaCadastradoException.class, () -> service.atualizar(1L, requestDTO));
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao atualizar com login de outro usuário")
+    void deveLancarExcecaoAoAtualizarLoginDuplicado() {
+        Usuario outroUsuario = new Usuario("Outro", "outro@email.com", "joaosilva", "hash");
+        try {
+            var field = Usuario.class.getDeclaredField("id");
+            field.setAccessible(true);
+            field.set(outroUsuario, 2L);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        when(repository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(repository.findByEmail(requestDTO.email())).thenReturn(Optional.of(usuario));
+        when(repository.findByLogin(requestDTO.login())).thenReturn(Optional.of(outroUsuario));
+
+        assertThrows(LoginJaCadastradoException.class, () -> service.atualizar(1L, requestDTO));
     }
 
     @Test
