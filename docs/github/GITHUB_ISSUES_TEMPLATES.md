@@ -819,12 +819,44 @@ Realizar o deploy da aplicação no Render.com para disponibilizar em produção
 
 ---
 
+### TASK-032: Refatorar código de português para inglês
+
+**Labels:** `priority: medium`, `épico: finalização`, `pontos: 5`  
+**Milestone:** Sprint 4 - Documentação e Entrega
+
+**Descrição:**
+
+```markdown
+## 📋 Descrição
+Refatorar todo o código-fonte do projeto para seguir a convenção de nomenclatura em inglês, incluindo classes, métodos, variáveis, exceções, DTOs, mensagens de erro e nomes de tabelas/colunas no banco de dados.
+
+## ✅ Critérios de Aceitação
+- [ ] Classes renomeadas (Usuario → User, UsuarioService → UserService, UsuarioController → UserController, etc)
+- [ ] DTOs renomeados (UsuarioRequestDTO → UserRequestDTO, UsuarioResponseDTO → UserResponseDTO, LoginRequestDTO/LoginResponseDTO mantidos)
+- [ ] Exceções renomeadas (UsuarioNaoEncontradoException → UserNotFoundException, EmailJaCadastradoException → EmailAlreadyExistsException, LoginJaCadastradoException → LoginAlreadyExistsException, CredenciaisInvalidasException → InvalidCredentialsException)
+- [ ] Métodos renomeados (criar → create, listar → findAll, buscarPorId → findById, atualizar → update, deletar → delete, login mantido)
+- [ ] Variáveis e campos renomeados para inglês
+- [ ] Mensagens de erro em inglês
+- [ ] Tabela e colunas do banco renomeadas (usuarios → users, nome → name, senha → password, dataUltimaAlteracao → lastModifiedDate)
+- [ ] Testes atualizados com novos nomes
+- [ ] Collection do Postman atualizada (se existir)
+- [ ] Aplicação compila e todos os testes passam
+
+## 🔧 Dependências Técnicas
+- Todas as tasks de implementação concluídas antes da refatoração
+
+## 📊 Estimativa
+5 pontos
+```
+
+---
+
 ## 🎯 Resumo Rápido
 
-**Total:** 31 Issues
+**Total:** 32 Issues
 
 -   **Alta Prioridade:** 21 issues
--   **Média Prioridade:** 7 issues
+-   **Média Prioridade:** 8 issues
 -   **Baixa Prioridade:** 3 issues
 
 **Por Sprint:**
@@ -832,7 +864,7 @@ Realizar o deploy da aplicação no Render.com para disponibilizar em produção
 -   Sprint 1: 7 issues (20 pontos)
 -   Sprint 2: 10 issues (22 pontos)
 -   Sprint 3: 5 issues (16 pontos)
--   Sprint 4: 9 issues (21 pontos)
+-   Sprint 4: 10 issues (26 pontos)
 
 ---
 
