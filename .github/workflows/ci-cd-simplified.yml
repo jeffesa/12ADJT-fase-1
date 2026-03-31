@@ -3,12 +3,7 @@
 name: CI/CD Pipeline - Simplified
 
 on:
-  pull_request:
-    branches:
-      - main
-  push:
-    branches:
-      - main
+  workflow_dispatch: # Desabilitado até configurar Render.com (TASK-031)
 
 jobs:
   # Job 1: Build e Testes (OBRIGATÓRIO)

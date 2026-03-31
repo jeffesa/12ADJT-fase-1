@@ -3,9 +3,7 @@
 name: Auto Deploy to Render
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch: # Desabilitado até configurar Render.com (TASK-031)
 
 jobs:
   deploy:
