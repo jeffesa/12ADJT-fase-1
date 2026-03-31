@@ -5,6 +5,7 @@ import com.fiap.fase1.dto.UsuarioRequestDTO;
 import com.fiap.fase1.dto.UsuarioResponseDTO;
 import com.fiap.fase1.exception.CredenciaisInvalidasException;
 import com.fiap.fase1.exception.EmailJaCadastradoException;
+import com.fiap.fase1.exception.LoginJaCadastradoException;
 import com.fiap.fase1.exception.UsuarioNaoEncontradoException;
 import com.fiap.fase1.model.Usuario;
 import com.fiap.fase1.repository.UsuarioRepository;
@@ -28,6 +29,9 @@ public class UsuarioService {
         if (repository.existsByEmail(dto.email())) {
             throw new EmailJaCadastradoException(dto.email());
         }
+        if (repository.existsByLogin(dto.login())) {
+            throw new LoginJaCadastradoException(dto.login());
+        }
         Usuario usuario = new Usuario(dto.nome(), dto.email(), dto.login(), passwordEncoder.encode(dto.senha()));
         return UsuarioResponseDTO.fromEntity(repository.save(usuario));
     }
@@ -45,6 +49,14 @@ public class UsuarioService {
     public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO dto) {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException(id));
+
+        repository.findByEmail(dto.email())
+                .filter(u -> !u.getId().equals(id))
+                .ifPresent(u -> { throw new EmailJaCadastradoException(dto.email()); });
+
+        repository.findByLogin(dto.login())
+                .filter(u -> !u.getId().equals(id))
+                .ifPresent(u -> { throw new LoginJaCadastradoException(dto.login()); });
 
         usuario.setNome(dto.nome());
         usuario.setEmail(dto.email());
