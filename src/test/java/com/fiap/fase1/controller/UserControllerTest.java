@@ -2,12 +2,12 @@ package com.fiap.fase1.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.fase1.dto.LoginRequestDTO;
-import com.fiap.fase1.dto.UsuarioRequestDTO;
-import com.fiap.fase1.dto.UsuarioResponseDTO;
-import com.fiap.fase1.exception.CredenciaisInvalidasException;
-import com.fiap.fase1.exception.EmailJaCadastradoException;
-import com.fiap.fase1.exception.UsuarioNaoEncontradoException;
-import com.fiap.fase1.service.UsuarioService;
+import com.fiap.fase1.dto.UserRequestDTO;
+import com.fiap.fase1.dto.UserResponseDTO;
+import com.fiap.fase1.exception.InvalidCredentialsException;
+import com.fiap.fase1.exception.EmailAlreadyExistsException;
+import com.fiap.fase1.exception.UserNotFoundException;
+import com.fiap.fase1.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,9 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fiap.fase1.config.SecurityConfig;
 import org.springframework.context.annotation.Import;
 
-@WebMvcTest(UsuarioController.class)
+@WebMvcTest(UserController.class)
 @Import(SecurityConfig.class)
-class UsuarioControllerTest {
+class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -41,34 +41,34 @@ class UsuarioControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private UsuarioService service;
+    private UserService service;
 
-    private UsuarioResponseDTO responseDTO;
-    private UsuarioRequestDTO requestDTO;
+    private UserResponseDTO responseDTO;
+    private UserRequestDTO requestDTO;
 
     @BeforeEach
     void setUp() {
-        responseDTO = new UsuarioResponseDTO(1L, "João Silva", "joao@email.com", "joaosilva", LocalDateTime.now());
-        requestDTO = new UsuarioRequestDTO("João Silva", "joao@email.com", "joaosilva", "senha123");
+        responseDTO = new UserResponseDTO(1L, "João Silva", "joao@email.com", "joaosilva", LocalDateTime.now());
+        requestDTO = new UserRequestDTO("João Silva", "joao@email.com", "joaosilva", "senha123");
     }
 
     @Test
     @DisplayName("POST /api/usuarios - deve criar usuário e retornar 201")
-    void deveCriarUsuario() throws Exception {
-        when(service.criar(any())).thenReturn(responseDTO);
+    void shouldCreateUser() throws Exception {
+        when(service.create(any())).thenReturn(responseDTO);
 
         mockMvc.perform(post("/api/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.email").value("joao@email.com"))
-                .andExpect(jsonPath("$.nome").value("João Silva"));
+                .andExpect(jsonPath("$.name").value("João Silva"));
     }
 
     @Test
     @DisplayName("POST /api/usuarios - deve retornar 409 com email duplicado")
-    void deveRetornar409EmailDuplicado() throws Exception {
-        when(service.criar(any())).thenThrow(new EmailJaCadastradoException("joao@email.com"));
+    void shouldReturn409DuplicateEmail() throws Exception {
+        when(service.create(any())).thenThrow(new EmailAlreadyExistsException("joao@email.com"));
 
         mockMvc.perform(post("/api/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -78,19 +78,19 @@ class UsuarioControllerTest {
 
     @Test
     @DisplayName("POST /api/usuarios - deve retornar 400 com dados inválidos")
-    void deveRetornar400DadosInvalidos() throws Exception {
-        UsuarioRequestDTO invalido = new UsuarioRequestDTO("", "email-invalido", "login", "123");
+    void shouldReturn400InvalidData() throws Exception {
+        UserRequestDTO invalid = new UserRequestDTO("", "email-invalido", "login", "123");
 
         mockMvc.perform(post("/api/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalido)))
+                        .content(objectMapper.writeValueAsString(invalid)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("GET /api/usuarios - deve listar usuários e retornar 200")
-    void deveListarUsuarios() throws Exception {
-        when(service.listar()).thenReturn(List.of(responseDTO));
+    void shouldListUsers() throws Exception {
+        when(service.findAll()).thenReturn(List.of(responseDTO));
 
         mockMvc.perform(get("/api/usuarios"))
                 .andExpect(status().isOk())
@@ -99,8 +99,8 @@ class UsuarioControllerTest {
 
     @Test
     @DisplayName("GET /api/usuarios/{id} - deve retornar usuário por ID")
-    void deveBuscarPorId() throws Exception {
-        when(service.buscarPorId(1L)).thenReturn(responseDTO);
+    void shouldFindById() throws Exception {
+        when(service.findById(1L)).thenReturn(responseDTO);
 
         mockMvc.perform(get("/api/usuarios/1"))
                 .andExpect(status().isOk())
@@ -109,8 +109,8 @@ class UsuarioControllerTest {
 
     @Test
     @DisplayName("GET /api/usuarios/{id} - deve retornar 404 para ID inexistente")
-    void deveRetornar404IdInexistente() throws Exception {
-        when(service.buscarPorId(99L)).thenThrow(new UsuarioNaoEncontradoException(99L));
+    void shouldReturn404NonExistentId() throws Exception {
+        when(service.findById(99L)).thenThrow(new UserNotFoundException(99L));
 
         mockMvc.perform(get("/api/usuarios/99"))
                 .andExpect(status().isNotFound());
@@ -118,8 +118,8 @@ class UsuarioControllerTest {
 
     @Test
     @DisplayName("PUT /api/usuarios/{id} - deve atualizar usuário e retornar 200")
-    void deveAtualizarUsuario() throws Exception {
-        when(service.atualizar(eq(1L), any())).thenReturn(responseDTO);
+    void shouldUpdateUser() throws Exception {
+        when(service.update(eq(1L), any())).thenReturn(responseDTO);
 
         mockMvc.perform(put("/api/usuarios/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -130,8 +130,8 @@ class UsuarioControllerTest {
 
     @Test
     @DisplayName("PUT /api/usuarios/{id} - deve retornar 404 para ID inexistente")
-    void deveRetornar404AoAtualizarInexistente() throws Exception {
-        when(service.atualizar(eq(99L), any())).thenThrow(new UsuarioNaoEncontradoException(99L));
+    void shouldReturn404UpdateNonExistent() throws Exception {
+        when(service.update(eq(99L), any())).thenThrow(new UserNotFoundException(99L));
 
         mockMvc.perform(put("/api/usuarios/99")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -141,15 +141,15 @@ class UsuarioControllerTest {
 
     @Test
     @DisplayName("DELETE /api/usuarios/{id} - deve deletar usuário e retornar 204")
-    void deveDeletarUsuario() throws Exception {
+    void shouldDeleteUser() throws Exception {
         mockMvc.perform(delete("/api/usuarios/1"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     @DisplayName("DELETE /api/usuarios/{id} - deve retornar 404 para ID inexistente")
-    void deveRetornar404AoDeletarInexistente() throws Exception {
-        doThrow(new UsuarioNaoEncontradoException(99L)).when(service).deletar(99L);
+    void shouldReturn404DeleteNonExistent() throws Exception {
+        doThrow(new UserNotFoundException(99L)).when(service).delete(99L);
 
         mockMvc.perform(delete("/api/usuarios/99"))
                 .andExpect(status().isNotFound());
@@ -157,7 +157,7 @@ class UsuarioControllerTest {
 
     @Test
     @DisplayName("POST /api/usuarios/login - deve realizar login e retornar 200")
-    void deveRealizarLogin() throws Exception {
+    void shouldLogin() throws Exception {
         LoginRequestDTO loginDTO = new LoginRequestDTO("joaosilva", "senha123");
 
         when(service.login(any())).thenReturn(responseDTO);
@@ -171,10 +171,10 @@ class UsuarioControllerTest {
 
     @Test
     @DisplayName("POST /api/usuarios/login - deve retornar 401 com credenciais inválidas")
-    void deveRetornar401CredenciaisInvalidas() throws Exception {
+    void shouldReturn401InvalidCredentials() throws Exception {
         LoginRequestDTO loginDTO = new LoginRequestDTO("joaosilva", "senhaErrada");
 
-        when(service.login(any())).thenThrow(new CredenciaisInvalidasException());
+        when(service.login(any())).thenThrow(new InvalidCredentialsException());
 
         mockMvc.perform(post("/api/usuarios/login")
                         .contentType(MediaType.APPLICATION_JSON)

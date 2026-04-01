@@ -23,7 +23,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"nome\": \"João Silva\",\n  \"email\": \"joao@email.com\",\n  \"login\": \"joaosilva\",\n  \"senha\": \"senha123\"\n}"
+          "raw": "{\n  \"name\": \"João Silva\",\n  \"email\": \"joao@email.com\",\n  \"login\": \"joaosilva\",\n  \"password\": \"senha123\"\n}"
         }
       }
     },
@@ -56,7 +56,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"nome\": \"João Atualizado\",\n  \"email\": \"joao@email.com\",\n  \"login\": \"joaosilva\",\n  \"senha\": \"novaSenha123\"\n}"
+          "raw": "{\n  \"name\": \"João Atualizado\",\n  \"email\": \"joao@email.com\",\n  \"login\": \"joaosilva\",\n  \"password\": \"novaSenha123\"\n}"
         }
       }
     },
@@ -81,7 +81,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"email\": \"joao@email.com\",\n  \"senha\": \"senha123\"\n}"
+          "raw": "{\n  \"login\": \"joaosilva\",\n  \"password\": \"senha123\"\n}"
         }
       }
     }
