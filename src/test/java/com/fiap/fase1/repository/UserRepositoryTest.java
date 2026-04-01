@@ -1,6 +1,6 @@
 package com.fiap.fase1.repository;
 
-import com.fiap.fase1.model.Usuario;
+import com.fiap.fase1.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,79 +14,79 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
-class UsuarioRepositoryTest {
+class UserRepositoryTest {
 
     @Autowired
-    private UsuarioRepository repository;
+    private UserRepository repository;
 
     @BeforeEach
     void setUp() {
-        repository.save(new Usuario("João Silva", "joao@email.com", "joaosilva", "senha_hash"));
+        repository.save(new User("João Silva", "joao@email.com", "joaosilva", "senha_hash"));
     }
 
     @Test
     @DisplayName("Deve encontrar usuário por email")
-    void deveEncontrarPorEmail() {
-        Optional<Usuario> resultado = repository.findByEmail("joao@email.com");
-        assertTrue(resultado.isPresent());
-        assertEquals("joao@email.com", resultado.get().getEmail());
+    void shouldFindByEmail() {
+        Optional<User> result = repository.findByEmail("joao@email.com");
+        assertTrue(result.isPresent());
+        assertEquals("joao@email.com", result.get().getEmail());
     }
 
     @Test
     @DisplayName("Deve retornar vazio ao buscar email inexistente")
-    void deveRetornarVazioEmailInexistente() {
+    void shouldReturnEmptyNonExistentEmail() {
         assertTrue(repository.findByEmail("naoexiste@email.com").isEmpty());
     }
 
     @Test
     @DisplayName("Deve encontrar usuário por login")
-    void deveEncontrarPorLogin() {
-        Optional<Usuario> resultado = repository.findByLogin("joaosilva");
-        assertTrue(resultado.isPresent());
-        assertEquals("joaosilva", resultado.get().getLogin());
+    void shouldFindByLogin() {
+        Optional<User> result = repository.findByLogin("joaosilva");
+        assertTrue(result.isPresent());
+        assertEquals("joaosilva", result.get().getLogin());
     }
 
     @Test
     @DisplayName("Deve retornar vazio ao buscar login inexistente")
-    void deveRetornarVazioLoginInexistente() {
+    void shouldReturnEmptyNonExistentLogin() {
         assertTrue(repository.findByLogin("naoexiste").isEmpty());
     }
 
     @Test
     @DisplayName("Deve retornar true para email já cadastrado")
-    void deveConfirmarEmailExistente() {
+    void shouldConfirmExistingEmail() {
         assertTrue(repository.existsByEmail("joao@email.com"));
     }
 
     @Test
     @DisplayName("Deve retornar false para email não cadastrado")
-    void deveConfirmarEmailInexistente() {
+    void shouldConfirmNonExistingEmail() {
         assertFalse(repository.existsByEmail("naoexiste@email.com"));
     }
 
     @Test
     @DisplayName("Deve retornar true para login já cadastrado")
-    void deveConfirmarLoginExistente() {
+    void shouldConfirmExistingLogin() {
         assertTrue(repository.existsByLogin("joaosilva"));
     }
 
     @Test
     @DisplayName("Deve retornar false para login não cadastrado")
-    void deveConfirmarLoginInexistente() {
+    void shouldConfirmNonExistingLogin() {
         assertFalse(repository.existsByLogin("naoexiste"));
     }
 
     @Test
     @DisplayName("Deve encontrar usuário por login e senha")
-    void deveEncontrarPorLoginESenha() {
-        Optional<Usuario> resultado = repository.findByLoginAndSenha("joaosilva", "senha_hash");
-        assertTrue(resultado.isPresent());
-        assertEquals("joaosilva", resultado.get().getLogin());
+    void shouldFindByLoginAndPassword() {
+        Optional<User> result = repository.findByLoginAndPassword("joaosilva", "senha_hash");
+        assertTrue(result.isPresent());
+        assertEquals("joaosilva", result.get().getLogin());
     }
 
     @Test
     @DisplayName("Deve retornar vazio ao buscar login e senha incorretos")
-    void deveRetornarVazioLoginSenhaIncorretos() {
-        assertTrue(repository.findByLoginAndSenha("joaosilva", "senha_errada").isEmpty());
+    void shouldReturnEmptyWrongLoginAndPassword() {
+        assertTrue(repository.findByLoginAndPassword("joaosilva", "senha_errada").isEmpty());
     }
 }
