@@ -1,6 +1,12 @@
 # BACKLOG - Tech Challenge Fase 1
 ## Sistema de Gerenciamento de Usuários
 
+> **⚠️ ATUALIZAÇÃO DE REQUISITOS (Abril/2026):**  
+> O PDF do Tech Challenge foi atualizado pela FIAP com novos requisitos.  
+> As tasks 033 a 041 foram criadas para atender essas mudanças.  
+> Tasks existentes impactadas receberam adendos (marcados com 🔄).  
+> Tasks já concluídas (001-006, 032) permanecem inalteradas no histórico.
+
 ---
 
 ## 📋 ÉPICO 1: Configuração Inicial do Projeto
@@ -47,6 +53,9 @@ Configurar o banco de dados relacional (PostgreSQL ou MySQL) com as configuraç�
 ### TASK-003: Criar entidade Usuario (User)
 **Prioridade:** Alta  
 **Estimativa:** 3 pontos
+**Status:** ✅ Concluída
+
+> 🔄 **Adendo (Abril/2026):** Novos requisitos exigem campo `type` (enum: RESTAURANT_OWNER, CUSTOMER) e campo `address` (objeto embeddable com rua, número, cidade, CEP). Ver TASK-033 e TASK-034.
 
 **Descrição:**  
 Desenvolver a entidade Usuario com todos os campos obrigatórios e anotações JPA necessárias.
@@ -82,6 +91,9 @@ Implementar a interface repository utilizando Spring Data JPA para operações d
 ### TASK-005: Criar DTOs (Data Transfer Objects)
 **Prioridade:** Alta  
 **Estimativa:** 2 pontos
+**Status:** ✅ Concluída
+
+> 🔄 **Adendo (Abril/2026):** Novos requisitos exigem DTOs com campos type e address, além de DTO separado para troca de senha (ChangePasswordDTO). Ver TASK-033, TASK-034 e TASK-035.
 
 **Descrição:**  
 Criar os DTOs necessários para requisições e respostas da API, separando a camada de apresentação da camada de domínio.
@@ -149,12 +161,15 @@ Implementar o endpoint REST para criação de novos usuários no sistema.
 - Validações de entrada funcionando
 - Tratamento de erros (email/login duplicado)
 - Location header com URI do recurso criado
+- Endpoint documentado com anotações Swagger (@Operation, @ApiResponse)
 
 ---
 
 ### TASK-009: Criar endpoint de atualização de usuário (PUT)
 **Prioridade:** Alta  
 **Estimativa:** 3 pontos
+
+> 🔄 **Adendo (Abril/2026):** Novos requisitos exigem que este endpoint atualize apenas dados do usuário (sem senha). A troca de senha deve ser feita em endpoint separado. Ver TASK-035 e TASK-036.
 
 **Descrição:**  
 Implementar o endpoint REST para atualização de dados de usuários existentes.
@@ -166,6 +181,7 @@ Implementar o endpoint REST para atualização de dados de usuários existentes.
 - Campo dataUltimaAlteracao atualizado automaticamente
 - Validação se usuário existe
 - Tratamento de erros apropriado
+- Endpoint documentado com anotações Swagger (@Operation, @ApiResponse)
 
 ---
 
@@ -182,6 +198,7 @@ Implementar o endpoint REST para exclusão de usuários pelo ID.
 - Retorna status 404 Not Found quando usuário não existe
 - Exclusão física do registro no banco
 - Logs da operação de exclusão
+- Endpoint documentado com anotações Swagger (@Operation, @ApiResponse)
 
 ---
 
@@ -197,6 +214,7 @@ Implementar o endpoint REST para buscar um usuário específico pelo ID.
 - Retorna UsuarioResponseDTO com status 200 OK
 - Retorna status 404 Not Found quando usuário não existe
 - Senha não exposta na resposta
+- Endpoint documentado com anotações Swagger (@Operation, @ApiResponse)
 
 ---
 
@@ -212,6 +230,7 @@ Implementar o endpoint REST para listar todos os usuários cadastrados.
 - Retorna lista de UsuarioResponseDTO com status 200 OK
 - Senhas não expostas na resposta
 - Retorna lista vazia quando não há usuários
+- Endpoint documentado com anotações Swagger (@Operation, @ApiResponse)
 
 ---
 
@@ -228,6 +247,7 @@ Implementar o endpoint REST para validação de credenciais de login.
 - Retorna LoginResponseDTO com mensagem de sucesso (status 200)
 - Retorna status 401 Unauthorized com mensagem quando credenciais inválidas
 - Não expõe informações sensíveis em caso de erro
+- Endpoint documentado com anotações Swagger (@Operation, @ApiResponse)
 
 ---
 
@@ -236,6 +256,8 @@ Implementar o endpoint REST para validação de credenciais de login.
 ### TASK-014: Implementar exception handler global
 **Prioridade:** Alta  
 **Estimativa:** 3 pontos
+
+> 🔄 **Adendo (Abril/2026):** Novos requisitos exigem implementação do padrão ProblemDetail (RFC 7807). Ver TASK-039.
 
 **Descrição:**  
 Criar um controlador global de exceções para padronizar as respostas de erro da API.
@@ -366,6 +388,8 @@ Criar arquivo .dockerignore para otimizar o build da imagem Docker.
 **Prioridade:** Alta  
 **Estimativa:** 3 pontos
 
+> 🔄 **Adendo (Abril/2026):** Novos requisitos exigem cenários adicionais na collection: troca de senha (endpoint exclusivo), busca por nome, tipos de usuário, e validação de login obrigatória.
+
 **Descrição:**  
 Desenvolver uma collection completa de testes para todos os endpoints da API.
 
@@ -453,9 +477,11 @@ Desenvolver um guia passo a passo para configurar e executar a aplicação.
 
 ---
 
-### TASK-026: Implementar Swagger/OpenAPI (opcional)
-**Prioridade:** Baixa  
+### TASK-026: Implementar Swagger/OpenAPI ~~(opcional)~~ (obrigatório)
+**Prioridade:** ~~Baixa~~ Alta  
 **Estimativa:** 2 pontos
+
+> 🔄 **Adendo (Abril/2026):** Swagger/OpenAPI passou de opcional para obrigatório nos novos requisitos. Prioridade alterada de Baixa para Alta. Ver TASK-040.
 
 **Descrição:**  
 Adicionar documentação interativa da API utilizando Swagger/OpenAPI.
@@ -570,15 +596,204 @@ Preparar todos os artefatos necessários para entrega do projeto.
 
 ---
 
+## � ÉPICO 11: Novos Requisitos - Atualização Tech Challenge (Abril/2026)
+
+> As tasks abaixo foram criadas após atualização do PDF do Tech Challenge pela FIAP.
+
+### TASK-033: Adicionar tipos de usuário (Dono de Restaurante e Cliente)
+**Prioridade:** Alta  
+**Estimativa:** 5 pontos
+
+**Descrição:**  
+O sistema deve obrigatoriamente contemplar dois tipos de usuário: Dono de restaurante e Cliente. Adicionar enum UserType e campo type na entidade User.
+
+**Critérios de Aceitação:**
+- Enum UserType criado (RESTAURANT_OWNER, CUSTOMER)
+- Campo type adicionado na entidade User (obrigatório)
+- DTOs atualizados para incluir type
+- Validação de type obrigatório no cadastro
+- Testes atualizados
+- Migration/DDL atualizado
+
+**Dependências Técnicas:**
+- TASK-003 (entidade User) concluída
+
+---
+
+### TASK-034: Adicionar campo endereço ao usuário
+**Prioridade:** Alta  
+**Estimativa:** 4 pontos
+
+**Descrição:**  
+Adicionar campo de endereço como objeto embeddable com atributos: rua, número, cidade, estado, CEP.
+
+**Critérios de Aceitação:**
+- Classe Address criada como @Embeddable
+- Campo address adicionado na entidade User
+- DTOs atualizados para incluir address
+- Validações de endereço implementadas
+- Testes atualizados
+
+**Dependências Técnicas:**
+- TASK-003 (entidade User) concluída
+
+---
+
+### TASK-035: Criar endpoint separado para troca de senha
+**Prioridade:** Alta  
+**Estimativa:** 3 pontos
+
+**Descrição:**  
+Implementar endpoint exclusivo para troca de senha do usuário, separado do endpoint de atualização de dados.
+
+**Critérios de Aceitação:**
+- Endpoint PATCH /api/v1/usuarios/{id}/password criado
+- ChangePasswordDTO criado (senhaAtual, novaSenha)
+- Validação da senha atual antes de trocar
+- Senha criptografada com BCrypt
+- Retorna 200 OK com mensagem de sucesso
+- Retorna 400 Bad Request se senha atual incorreta
+- Retorna 404 Not Found se usuário não existe
+- Testes unitários criados
+
+**Dependências Técnicas:**
+- TASK-006 (UserService) concluída
+- TASK-016 (BCrypt) concluída
+
+---
+
+### TASK-036: Separar endpoint de atualização de dados (sem senha)
+**Prioridade:** Alta  
+**Estimativa:** 3 pontos
+
+**Descrição:**  
+Ajustar o endpoint PUT de atualização para que atualize apenas dados do usuário (nome, email, login, type, address), sem incluir senha.
+
+**Critérios de Aceitação:**
+- Endpoint PUT /api/v1/usuarios/{id} atualiza apenas dados (sem senha)
+- DTO de atualização não inclui campo senha
+- Campo lastModifiedDate atualizado automaticamente
+- Validações de unicidade de email e login mantidas
+- Testes atualizados
+
+**Dependências Técnicas:**
+- TASK-009 (endpoint PUT) existente
+- TASK-035 (endpoint de senha) criada
+
+---
+
+### TASK-037: Criar endpoint de busca de usuários por nome
+**Prioridade:** Alta  
+**Estimativa:** 2 pontos
+
+**Descrição:**  
+Implementar endpoint para buscar usuários pelo nome (busca parcial, case-insensitive).
+
+**Critérios de Aceitação:**
+- Endpoint GET /api/v1/usuarios?name=João criado
+- Busca parcial (LIKE %nome%)
+- Case-insensitive
+- Retorna lista de UserResponseDTO
+- Retorna lista vazia se nenhum resultado
+- Método findByNameContainingIgnoreCase no repository
+- Testes unitários criados
+
+**Dependências Técnicas:**
+- TASK-004 (UserRepository) concluída
+- TASK-012 (endpoint GET listagem) existente
+
+---
+
+### TASK-038: Implementar versionamento de API
+**Prioridade:** Alta  
+**Estimativa:** 2 pontos
+
+**Descrição:**  
+Implementar estratégia de versionamento de API via URL path (/api/v1/).
+
+**Critérios de Aceitação:**
+- Todos os endpoints migrados para /api/v1/usuarios
+- @RequestMapping atualizado no controller
+- Collection Postman atualizada
+- Testes atualizados
+- Documentação atualizada
+
+**Dependências Técnicas:**
+- Todos os endpoints existentes
+
+---
+
+### TASK-039: Implementar ProblemDetail (RFC 7807)
+**Prioridade:** Alta  
+**Estimativa:** 4 pontos
+
+**Descrição:**  
+Migrar o GlobalExceptionHandler para utilizar o padrão ProblemDetail (RFC 7807) do Spring Framework para padronizar respostas de erro.
+
+**Critérios de Aceitação:**
+- GlobalExceptionHandler migrado para retornar ProblemDetail
+- Campos obrigatórios: type, title, status, detail, instance
+- Todas as exceções customizadas mapeadas
+- Validações (MethodArgumentNotValidException) retornando ProblemDetail
+- Testes atualizados para validar formato ProblemDetail
+- Mensagens de erro mantidas em português
+
+**Dependências Técnicas:**
+- TASK-014 (GlobalExceptionHandler) existente
+
+---
+
+### TASK-040: Implementar Swagger/OpenAPI (obrigatório)
+**Prioridade:** Alta  
+**Estimativa:** 3 pontos
+
+**Descrição:**  
+Adicionar documentação interativa da API utilizando Swagger/OpenAPI. Agora obrigatório conforme novos requisitos.
+
+**Critérios de Aceitação:**
+- Dependência Springdoc OpenAPI adicionada
+- Swagger UI acessível via /swagger-ui.html
+- Todos os endpoints documentados com descrições
+- Exemplos de requisições e respostas de sucesso e erro
+- Schemas dos DTOs documentados
+- Informações de versionamento da API
+
+**Dependências Técnicas:**
+- TASK-026 (Swagger opcional) → agora obrigatório
+- TASK-038 (versionamento) recomendada
+
+---
+
+### TASK-041: Criar relatório técnico em PDF
+**Prioridade:** Alta  
+**Estimativa:** 5 pontos
+
+**Descrição:**  
+Criar o relatório técnico em PDF, único entregável oficial do Tech Challenge.
+
+**Critérios de Aceitação:**
+- Descrição detalhada da arquitetura da aplicação
+- Modelagem das entidades e relacionamentos
+- Descrição dos endpoints disponíveis (com exemplos de uso)
+- Descrição da documentação Swagger (prints ou trechos)
+- Descrição da coleção Postman (com prints e exemplos)
+- Estrutura do banco de dados (tabelas)
+- Passo a passo para executar a aplicação com Docker Compose (variáveis de ambiente e exemplos)
+
+**Dependências Técnicas:**
+- Todas as tasks de implementação concluídas
+
+---
+
 ## 📊 RESUMO DO BACKLOG
 
-**Total de Tasks:** 31  
-**Estimativa Total:** 79 pontos
+**Total de Tasks:** 41  
+**Estimativa Total:** ~115 pontos
 
 ### Por Prioridade:
-- **Alta:** 21 tasks
-- **Média:** 7 tasks
-- **Baixa:** 3 tasks
+- **Alta:** 29 tasks
+- **Média:** 8 tasks
+- **Baixa:** 4 tasks
 
 ### Por Épico:
 1. Configuração Inicial: 2 tasks (5 pontos)
@@ -590,13 +805,14 @@ Preparar todos os artefatos necessários para entrega do projeto.
 7. Docker: 3 tasks (8 pontos)
 8. Testes: 2 tasks (8 pontos)
 9. Documentação: 4 tasks (10 pontos)
-10. Finalização: 5 tasks (11 pontos)
+10. Finalização: 6 tasks (14 pontos)
+11. Novos Requisitos (Abril/2026): 9 tasks (~36 pontos)
 
 ---
 
 ## 🎯 ORDEM SUGERIDA DE EXECUÇÃO
 
-**Sprint 1 - Fundação (Tasks 1-7):**
+**Sprint 1 - Fundação (Tasks 1-7):** ✅ Concluído
 - Configuração inicial e estrutura base
 - Entidade, repository e service
 - Validação de login
@@ -608,13 +824,25 @@ Preparar todos os artefatos necessários para entrega do projeto.
 
 **Sprint 3 - Docker e Testes (Tasks 18-22):**
 - Containerização completa
-- Collections de teste
+- Collections de teste atualizadas
 
 **Sprint 4 - Documentação e Entrega (Tasks 23-31):**
 - Documentação completa
-- Deploy no Render.com
-- Testes finais
-- Preparação para entrega
+- Swagger/OpenAPI obrigatório (TASK-040)
+- Deploy no Render.com (TASK-031, se der tempo)
+- Testes finais e preparação para entrega
+
+**Sprint 5 - Novos Requisitos Tech Challenge (Tasks 33-41):**
+- Tipos de usuário e endereço (TASK-033, TASK-034)
+- Endpoint separado de troca de senha (TASK-035)
+- Separar endpoint de atualização (TASK-036)
+- Busca por nome (TASK-037)
+- Versionamento de API (TASK-038)
+- ProblemDetail RFC 7807 (TASK-039)
+- Relatório técnico em PDF (TASK-041)
+
+**Refatoração (Task 32):** ✅ Concluído
+- Código refatorado de português para inglês
 
 ---
 
