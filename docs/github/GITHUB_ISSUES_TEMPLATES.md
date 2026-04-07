@@ -210,6 +210,7 @@ Implementar o endpoint REST para criação de novos usuários no sistema.
 - [ ] Validações de entrada funcionando
 - [ ] Tratamento de erros (email/login duplicado)
 - [ ] Location header com URI do recurso criado
+- [ ] Endpoint documentado com anotações Swagger (@Operation, @ApiResponse)
 
 ## 📊 Estimativa
 3 pontos
@@ -235,6 +236,7 @@ Implementar o endpoint REST para atualização de dados de usuários existentes.
 - [ ] Campo dataUltimaAlteracao atualizado automaticamente
 - [ ] Validação se usuário existe
 - [ ] Tratamento de erros apropriado
+- [ ] Endpoint documentado com anotações Swagger (@Operation, @ApiResponse)
 
 ## 📊 Estimativa
 3 pontos
@@ -259,6 +261,7 @@ Implementar o endpoint REST para exclusão de usuários pelo ID.
 - [ ] Retorna status 404 Not Found quando usuário não existe
 - [ ] Exclusão física do registro no banco
 - [ ] Logs da operação de exclusão
+- [ ] Endpoint documentado com anotações Swagger (@Operation, @ApiResponse)
 
 ## 📊 Estimativa
 2 pontos
@@ -282,6 +285,7 @@ Implementar o endpoint REST para buscar um usuário específico pelo ID.
 - [ ] Retorna UsuarioResponseDTO com status 200 OK
 - [ ] Retorna status 404 Not Found quando usuário não existe
 - [ ] Senha não exposta na resposta
+- [ ] Endpoint documentado com anotações Swagger (@Operation, @ApiResponse)
 
 ## 📊 Estimativa
 2 pontos
@@ -305,6 +309,7 @@ Implementar o endpoint REST para listar todos os usuários cadastrados.
 - [ ] Retorna lista de UsuarioResponseDTO com status 200 OK
 - [ ] Senhas não expostas na resposta
 - [ ] Retorna lista vazia quando não há usuários
+- [ ] Endpoint documentado com anotações Swagger (@Operation, @ApiResponse)
 
 ## 📊 Estimativa
 2 pontos
@@ -329,6 +334,7 @@ Implementar o endpoint REST para validação de credenciais de login.
 - [ ] Retorna LoginResponseDTO com mensagem de sucesso (status 200)
 - [ ] Retorna status 401 Unauthorized com mensagem quando credenciais inválidas
 - [ ] Não expõe informações sensíveis em caso de erro
+- [ ] Endpoint documentado com anotações Swagger (@Operation, @ApiResponse)
 
 ## 📊 Estimativa
 3 pontos
@@ -851,20 +857,286 @@ Refatorar todo o código-fonte do projeto para seguir a convenção de nomenclat
 
 ---
 
+## ÉPICO 11: Novos Requisitos - Atualização Tech Challenge (Abril/2026)
+
+> As tasks abaixo foram criadas após atualização do PDF do Tech Challenge pela FIAP.
+
+### TASK-033: Adicionar tipos de usuário (Dono de Restaurante e Cliente)
+
+**Labels:** `priority: high`, `épico: novos-requisitos`, `pontos: 5`  
+**Milestone:** Sprint 5 - Novos Requisitos
+
+**Descrição:**
+
+```markdown
+## 📋 Descrição
+O sistema deve obrigatoriamente contemplar dois tipos de usuário: Dono de restaurante e Cliente. Adicionar enum UserType e campo type na entidade User.
+
+## ✅ Critérios de Aceitação
+- [ ] Enum UserType criado (RESTAURANT_OWNER, CUSTOMER)
+- [ ] Campo type adicionado na entidade User (obrigatório)
+- [ ] DTOs atualizados para incluir type
+- [ ] Validação de type obrigatório no cadastro
+- [ ] Testes atualizados
+- [ ] Migration/DDL atualizado
+
+## 🔧 Dependências Técnicas
+- TASK-003 (entidade User) concluída
+
+## 📊 Estimativa
+5 pontos
+```
+
+---
+
+### TASK-034: Adicionar campo endereço ao usuário
+
+**Labels:** `priority: high`, `épico: novos-requisitos`, `pontos: 4`  
+**Milestone:** Sprint 5 - Novos Requisitos
+
+**Descrição:**
+
+```markdown
+## 📋 Descrição
+Adicionar campo de endereço como objeto embeddable com atributos: rua, número, cidade, estado, CEP.
+
+## ✅ Critérios de Aceitação
+- [ ] Classe Address criada como @Embeddable
+- [ ] Campo address adicionado na entidade User
+- [ ] DTOs atualizados para incluir address
+- [ ] Validações de endereço implementadas
+- [ ] Testes atualizados
+
+## 🔧 Dependências Técnicas
+- TASK-003 (entidade User) concluída
+
+## 📊 Estimativa
+4 pontos
+```
+
+---
+
+### TASK-035: Criar endpoint separado para troca de senha
+
+**Labels:** `priority: high`, `épico: novos-requisitos`, `pontos: 3`  
+**Milestone:** Sprint 5 - Novos Requisitos
+
+**Descrição:**
+
+```markdown
+## 📋 Descrição
+Implementar endpoint exclusivo para troca de senha do usuário, separado do endpoint de atualização de dados.
+
+## ✅ Critérios de Aceitação
+- [ ] Endpoint PATCH /api/v1/usuarios/{id}/password criado
+- [ ] ChangePasswordDTO criado (senhaAtual, novaSenha)
+- [ ] Validação da senha atual antes de trocar
+- [ ] Senha criptografada com BCrypt
+- [ ] Retorna 200 OK com mensagem de sucesso
+- [ ] Retorna 400 Bad Request se senha atual incorreta
+- [ ] Retorna 404 Not Found se usuário não existe
+- [ ] Testes unitários criados
+- [ ] Endpoint documentado com anotações Swagger (@Operation, @ApiResponse)
+
+## 🔧 Dependências Técnicas
+- TASK-006 (UserService) concluída
+- TASK-016 (BCrypt) concluída
+
+## 📊 Estimativa
+3 pontos
+```
+
+---
+
+### TASK-036: Separar endpoint de atualização de dados (sem senha)
+
+**Labels:** `priority: high`, `épico: novos-requisitos`, `pontos: 3`  
+**Milestone:** Sprint 5 - Novos Requisitos
+
+**Descrição:**
+
+```markdown
+## 📋 Descrição
+Ajustar o endpoint PUT de atualização para que atualize apenas dados do usuário (nome, email, login, type, address), sem incluir senha.
+
+## ✅ Critérios de Aceitação
+- [ ] Endpoint PUT /api/v1/usuarios/{id} atualiza apenas dados (sem senha)
+- [ ] DTO de atualização não inclui campo senha
+- [ ] Campo lastModifiedDate atualizado automaticamente
+- [ ] Validações de unicidade de email e login mantidas
+- [ ] Testes atualizados
+- [ ] Endpoint documentado com anotações Swagger (@Operation, @ApiResponse)
+
+## 🔧 Dependências Técnicas
+- TASK-009 (endpoint PUT) existente
+- TASK-035 (endpoint de senha) criada
+
+## 📊 Estimativa
+3 pontos
+```
+
+---
+
+### TASK-037: Criar endpoint de busca de usuários por nome
+
+**Labels:** `priority: high`, `épico: novos-requisitos`, `pontos: 2`  
+**Milestone:** Sprint 5 - Novos Requisitos
+
+**Descrição:**
+
+```markdown
+## 📋 Descrição
+Implementar endpoint para buscar usuários pelo nome (busca parcial, case-insensitive).
+
+## ✅ Critérios de Aceitação
+- [ ] Endpoint GET /api/v1/usuarios?name=João criado
+- [ ] Busca parcial (LIKE %nome%)
+- [ ] Case-insensitive
+- [ ] Retorna lista de UserResponseDTO
+- [ ] Retorna lista vazia se nenhum resultado
+- [ ] Método findByNameContainingIgnoreCase no repository
+- [ ] Testes unitários criados
+- [ ] Endpoint documentado com anotações Swagger (@Operation, @ApiResponse)
+
+## 🔧 Dependências Técnicas
+- TASK-004 (UserRepository) concluída
+- TASK-012 (endpoint GET listagem) existente
+
+## 📊 Estimativa
+2 pontos
+```
+
+---
+
+### TASK-038: Implementar versionamento de API
+
+**Labels:** `priority: high`, `épico: novos-requisitos`, `pontos: 2`  
+**Milestone:** Sprint 5 - Novos Requisitos
+
+**Descrição:**
+
+```markdown
+## 📋 Descrição
+Implementar estratégia de versionamento de API via URL path (/api/v1/).
+
+## ✅ Critérios de Aceitação
+- [ ] Todos os endpoints migrados para /api/v1/usuarios
+- [ ] @RequestMapping atualizado no controller
+- [ ] Collection Postman atualizada
+- [ ] Testes atualizados
+- [ ] Documentação atualizada
+
+## 🔧 Dependências Técnicas
+- Todos os endpoints existentes
+
+## 📊 Estimativa
+2 pontos
+```
+
+---
+
+### TASK-039: Implementar ProblemDetail (RFC 7807)
+
+**Labels:** `priority: high`, `épico: novos-requisitos`, `pontos: 4`  
+**Milestone:** Sprint 5 - Novos Requisitos
+
+**Descrição:**
+
+```markdown
+## 📋 Descrição
+Migrar o GlobalExceptionHandler para utilizar o padrão ProblemDetail (RFC 7807) do Spring Framework para padronizar respostas de erro.
+
+## ✅ Critérios de Aceitação
+- [ ] GlobalExceptionHandler migrado para retornar ProblemDetail
+- [ ] Campos obrigatórios: type, title, status, detail, instance
+- [ ] Todas as exceções customizadas mapeadas
+- [ ] Validações (MethodArgumentNotValidException) retornando ProblemDetail
+- [ ] Testes atualizados para validar formato ProblemDetail
+- [ ] Mensagens de erro mantidas em português
+
+## 🔧 Dependências Técnicas
+- TASK-014 (GlobalExceptionHandler) existente
+
+## 📊 Estimativa
+4 pontos
+```
+
+---
+
+### TASK-040: Implementar Swagger/OpenAPI (obrigatório)
+
+**Labels:** `priority: high`, `épico: novos-requisitos`, `pontos: 3`  
+**Milestone:** Sprint 5 - Documentação e Entrega
+
+**Descrição:**
+
+```markdown
+## 📋 Descrição
+Adicionar documentação interativa da API utilizando Swagger/OpenAPI. Agora obrigatório conforme novos requisitos.
+
+## ✅ Critérios de Aceitação
+- [ ] Dependência Springdoc OpenAPI adicionada
+- [ ] Swagger UI acessível via /swagger-ui.html
+- [ ] Todos os endpoints documentados com descrições
+- [ ] Exemplos de requisições e respostas de sucesso e erro
+- [ ] Schemas dos DTOs documentados
+- [ ] Informações de versionamento da API
+
+## 🔧 Dependências Técnicas
+- TASK-026 (Swagger opcional) → agora obrigatório
+- TASK-038 (versionamento) recomendada
+
+## 📊 Estimativa
+3 pontos
+```
+
+---
+
+### TASK-041: Criar relatório técnico em PDF
+
+**Labels:** `priority: high`, `épico: novos-requisitos`, `pontos: 5`  
+**Milestone:** Sprint 5 - Documentação e Entrega
+
+**Descrição:**
+
+```markdown
+## 📋 Descrição
+Criar o relatório técnico em PDF, único entregável oficial do Tech Challenge.
+
+## ✅ Critérios de Aceitação
+- [ ] Descrição detalhada da arquitetura da aplicação
+- [ ] Modelagem das entidades e relacionamentos
+- [ ] Descrição dos endpoints disponíveis (com exemplos de uso)
+- [ ] Descrição da documentação Swagger (prints ou trechos)
+- [ ] Descrição da coleção Postman (com prints e exemplos)
+- [ ] Estrutura do banco de dados (tabelas)
+- [ ] Passo a passo para executar a aplicação com Docker Compose (variáveis de ambiente e exemplos)
+
+## 🔧 Dependências Técnicas
+- Todas as tasks de implementação concluídas
+
+## 📊 Estimativa
+5 pontos
+```
+
+---
+
 ## 🎯 Resumo Rápido
 
-**Total:** 32 Issues
+**Total:** 41 Issues
 
--   **Alta Prioridade:** 21 issues
+-   **Alta Prioridade:** 29 issues
 -   **Média Prioridade:** 8 issues
--   **Baixa Prioridade:** 3 issues
+-   **Baixa Prioridade:** 4 issues
 
 **Por Sprint:**
 
--   Sprint 1: 7 issues (20 pontos)
+-   Sprint 1: 7 issues (20 pontos) ✅ Concluído
 -   Sprint 2: 10 issues (22 pontos)
--   Sprint 3: 5 issues (16 pontos)
--   Sprint 4: 10 issues (26 pontos)
+-   Sprint 3 - Novos Requisitos: 7 issues (23 pontos)
+-   Sprint 4: 5 issues (16 pontos)
+-   Sprint 5: 10 issues (26 pontos)
+-   Refatoração: 2 issues (10 pontos) ✅ TASK-032 Concluída
 
 ---
 
