@@ -84,6 +84,23 @@
           "raw": "{\n  \"login\": \"joaosilva\",\n  \"password\": \"senha123\"\n}"
         }
       }
+    },
+    {
+      "name": "Login - Credenciais Inválidas",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/usuarios/login",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"login\": \"joaosilva\",\n  \"password\": \"senhaErrada\"\n}"
+        }
+      }
     }
   ]
 }
