@@ -1,6 +1,7 @@
 package com.fiap.fase1.controller;
 
 import com.fiap.fase1.dto.LoginRequestDTO;
+import com.fiap.fase1.dto.LoginResponseDTO;
 import com.fiap.fase1.dto.UserRequestDTO;
 import com.fiap.fase1.dto.UserResponseDTO;
 import com.fiap.fase1.service.UserService;
@@ -48,7 +49,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDTO> login(@Valid @RequestBody LoginRequestDTO dto) {
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO dto) {
         return ResponseEntity.ok(service.login(dto));
     }
 }

@@ -1,6 +1,7 @@
 package com.fiap.fase1.service;
 
 import com.fiap.fase1.dto.LoginRequestDTO;
+import com.fiap.fase1.dto.LoginResponseDTO;
 import com.fiap.fase1.dto.UserRequestDTO;
 import com.fiap.fase1.dto.UserResponseDTO;
 import com.fiap.fase1.exception.InvalidCredentialsException;
@@ -211,10 +212,12 @@ class UserServiceTest {
         when(repository.findByLogin("joaosilva")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("senha123", "senha_hash")).thenReturn(true);
 
-        UserResponseDTO response = service.login(loginDTO);
+        LoginResponseDTO response = service.login(loginDTO);
 
         assertNotNull(response);
+        assertEquals("Login realizado com sucesso", response.message());
         assertEquals("joao@email.com", response.email());
+        assertEquals("joaosilva", response.login());
     }
 
     @Test
