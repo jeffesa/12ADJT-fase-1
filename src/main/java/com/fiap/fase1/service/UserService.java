@@ -1,6 +1,7 @@
 package com.fiap.fase1.service;
 
 import com.fiap.fase1.dto.LoginRequestDTO;
+import com.fiap.fase1.dto.LoginResponseDTO;
 import com.fiap.fase1.dto.UserRequestDTO;
 import com.fiap.fase1.dto.UserResponseDTO;
 import com.fiap.fase1.exception.InvalidCredentialsException;
@@ -9,6 +10,8 @@ import com.fiap.fase1.exception.LoginAlreadyExistsException;
 import com.fiap.fase1.exception.UserNotFoundException;
 import com.fiap.fase1.model.User;
 import com.fiap.fase1.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,8 @@ import java.util.List;
 
 @Service
 public class UserService {
+
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
@@ -73,14 +78,27 @@ public class UserService {
         repository.deleteById(id);
     }
 
-    public UserResponseDTO login(LoginRequestDTO dto) {
+    public LoginResponseDTO login(LoginRequestDTO dto) {
+        log.info("Tentativa de login para o usuário: {}", dto.login());
+
         User user = repository.findByLogin(dto.login())
-                .orElseThrow(InvalidCredentialsException::new);
+                .orElseThrow(() -> {
+                    log.warn("Tentativa de login falhou - usuário não encontrado: {}", dto.login());
+                    return new InvalidCredentialsException();
+                });
 
         if (!passwordEncoder.matches(dto.password(), user.getPassword())) {
+            log.warn("Tentativa de login falhou - senha incorreta para o usuário: {}", dto.login());
             throw new InvalidCredentialsException();
         }
 
-        return UserResponseDTO.fromEntity(user);
+        log.info("Login realizado com sucesso para o usuário: {}", dto.login());
+        return new LoginResponseDTO(
+                "Login realizado com sucesso",
+                user.getId(),
+                user.getLogin(),
+                user.getEmail(),
+                user.getLastModifiedDate()
+        );
     }
 }

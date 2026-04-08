@@ -2,6 +2,7 @@ package com.fiap.fase1.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.fase1.dto.LoginRequestDTO;
+import com.fiap.fase1.dto.LoginResponseDTO;
 import com.fiap.fase1.dto.UserRequestDTO;
 import com.fiap.fase1.dto.UserResponseDTO;
 import com.fiap.fase1.exception.InvalidCredentialsException;
@@ -45,11 +46,13 @@ class UserControllerTest {
 
     private UserResponseDTO responseDTO;
     private UserRequestDTO requestDTO;
+    private LoginResponseDTO loginResponseDTO;
 
     @BeforeEach
     void setUp() {
         responseDTO = new UserResponseDTO(1L, "João Silva", "joao@email.com", "joaosilva", LocalDateTime.now());
         requestDTO = new UserRequestDTO("João Silva", "joao@email.com", "joaosilva", "senha123");
+        loginResponseDTO = new LoginResponseDTO("Login realizado com sucesso", 1L, "joaosilva", "joao@email.com", LocalDateTime.now());
     }
 
     @Test
@@ -160,13 +163,15 @@ class UserControllerTest {
     void shouldLogin() throws Exception {
         LoginRequestDTO loginDTO = new LoginRequestDTO("joaosilva", "senha123");
 
-        when(service.login(any())).thenReturn(responseDTO);
+        when(service.login(any())).thenReturn(loginResponseDTO);
 
         mockMvc.perform(post("/api/usuarios/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginDTO)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("joao@email.com"));
+                .andExpect(jsonPath("$.message").value("Login realizado com sucesso"))
+                .andExpect(jsonPath("$.email").value("joao@email.com"))
+                .andExpect(jsonPath("$.login").value("joaosilva"));
     }
 
     @Test
