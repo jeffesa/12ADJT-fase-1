@@ -1,0 +1,22 @@
+name: Auto PR develop → main
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create Pull Request to main
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_branch: main
+          pr_title: "chore: sync develop → main"
+          pr_body: "PR automático criado após merge na develop."
+          pr_label: "auto-pr"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
