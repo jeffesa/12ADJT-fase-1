@@ -27,6 +27,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
 import com.fiap.fase1.config.SecurityConfig;
 import org.springframework.context.annotation.Import;
@@ -64,6 +65,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
                 .andExpect(jsonPath("$.email").value("joao@email.com"))
                 .andExpect(jsonPath("$.name").value("João Silva"));
     }
