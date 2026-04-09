@@ -296,15 +296,16 @@ mvn clean install -DskipTests
 #### 5. Executar a Aplicação
 
 ```bash
-# Modo desenvolvimento
-mvn spring-boot:run
+# Usando o script run.sh (recomendado)
+./run.sh          # profile test (H2 em memória, padrão)
+# ./run.sh dev    # profile dev (PostgreSQL local - requer Docker)
+# ./run.sh prod   # profile prod (requer configuração de produção)
 
-# Com profile específico
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
-
-# Executar JAR compilado
-java -jar target/fase-1-spring-explorer-1.0.0.jar
+# Ou manualmente com Maven
+mvn spring-boot:run -Dspring-boot.run.profiles=test
 ```
+
+> O `run.sh` detecta automaticamente o Java 17, mata processos na porta 8080 se necessário e inicia a aplicação com o profile escolhido.
 
 A aplicação estará disponível em: **[http://localhost:8080](http://localhost:8080)**
 
