@@ -8,15 +8,25 @@ on:
 jobs:
   create-pr:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Create Pull Request to main
-        uses: repo-sync/pull-request@v2
-        with:
-          destination_branch: main
-          pr_title: "chore: sync develop → main"
-          pr_body: "PR automático criado após merge na develop."
-          pr_label: "auto-pr"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING_PR=$(gh pr list --base main --head develop --state open --json number --jq '.[0].number')
+          if [ -z "$EXISTING_PR" ]; then
+            gh pr create \
+              --base main \
+              --head develop \
+              --title "chore: sync develop → main" \
+              --body "PR automático criado após merge na develop." \
+              --label "auto-pr" || true
+          else
+            echo "PR #$EXISTING_PR já existe, pulando criação."
+          fi
