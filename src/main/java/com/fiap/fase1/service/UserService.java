@@ -72,10 +72,13 @@ public class UserService {
     }
 
     public void delete(Long id) {
+        log.info("Solicitação de exclusão do usuário com id: {}", id);
         if (!repository.existsById(id)) {
+            log.warn("Tentativa de exclusão falhou - usuário não encontrado com id: {}", id);
             throw new UserNotFoundException(id);
         }
         repository.deleteById(id);
+        log.info("Usuário com id: {} excluído com sucesso", id);
     }
 
     public LoginResponseDTO login(LoginRequestDTO dto) {
