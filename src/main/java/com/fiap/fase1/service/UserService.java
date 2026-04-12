@@ -37,7 +37,13 @@ public class UserService {
         if (repository.existsByLogin(dto.login())) {
             throw new LoginAlreadyExistsException(dto.login());
         }
-        User user = new User(dto.name(), dto.email(), dto.login(), passwordEncoder.encode(dto.password()));
+        User user = new User(
+                dto.name(),
+                dto.email(),
+                dto.login(),
+                passwordEncoder.encode(dto.password()),
+                dto.address()
+        );
         return UserResponseDTO.fromEntity(repository.save(user));
     }
 
@@ -67,6 +73,7 @@ public class UserService {
         user.setEmail(dto.email());
         user.setLogin(dto.login());
         user.setPassword(passwordEncoder.encode(dto.password()));
+        user.setAddress(dto.address());
 
         return UserResponseDTO.fromEntity(repository.save(user));
     }

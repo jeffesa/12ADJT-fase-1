@@ -45,7 +45,7 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = new User("João Silva", "joao@email.com", "joaosilva", "senha_hash");
+        user = new User("João Silva", "joao@email.com", "joaosilva", "senha_hash", "Rua A, 123");
         try {
             var field = User.class.getDeclaredField("id");
             field.setAccessible(true);
@@ -58,7 +58,7 @@ class UserServiceTest {
             throw new RuntimeException("Falha ao setar campos via reflection", e);
         }
 
-        requestDTO = new UserRequestDTO("João Silva", "joao@email.com", "joaosilva", "senha123");
+        requestDTO = new UserRequestDTO("João Silva", "joao@email.com", "joaosilva", "senha123", "Rua A, 123");
     }
 
     @Test
@@ -144,7 +144,7 @@ class UserServiceTest {
     @Test
     @DisplayName("Deve lançar exceção ao atualizar com email de outro usuário")
     void shouldThrowExceptionUpdateDuplicateEmail() {
-        User otherUser = new User("Outro", "joao@email.com", "outro", "hash");
+        User otherUser = new User("Outro", "joao@email.com", "outro", "hash", "Rua A, 123");
         try {
             var field = User.class.getDeclaredField("id");
             field.setAccessible(true);
@@ -162,7 +162,7 @@ class UserServiceTest {
     @Test
     @DisplayName("Deve lançar exceção ao atualizar com login de outro usuário")
     void shouldThrowExceptionUpdateDuplicateLogin() {
-        User otherUser = new User("Outro", "outro@email.com", "joaosilva", "hash");
+        User otherUser = new User("Outro", "outro@email.com", "joaosilva", "hash", "Rua A, 123");
         try {
             var field = User.class.getDeclaredField("id");
             field.setAccessible(true);
