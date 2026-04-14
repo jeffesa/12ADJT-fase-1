@@ -1,0 +1,21 @@
+# Ignora arquivos e pastas desnecessários para o build da imagem Docker
+.git
+.idea
+target/
+*.iml
+*.log
+*.md
+*.sh
+*.jar
+*.exec
+*.lst
+*.txt
+*.DS_Store
+*.swp
+*.swo
+*.bak
+*.tmp
+*.swp
+*.swo
+*.bak
+*.tmp
