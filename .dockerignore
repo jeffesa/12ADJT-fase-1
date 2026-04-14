@@ -1,21 +1,33 @@
-# Ignora arquivos e pastas desnecessários para o build da imagem Docker
-.git
-.idea
+# Build
 target/
+build/
+
+# IDEs
+.idea/
+.vscode/
 *.iml
+*.ipr
+*.iws
+
+# Git
+.git/
+.gitignore
+
+# Logs e temporários
 *.log
-*.md
-*.sh
-*.jar
+*.tmp
+*.swp
+*.swo
 *.exec
-*.lst
-*.txt
-*.DS_Store
-*.swp
-*.swo
 *.bak
-*.tmp
-*.swp
-*.swo
-*.bak
-*.tmp
+
+# Cache
+.cache/
+node_modules/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Backups
+*~
