@@ -51,8 +51,8 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        responseDTO = new UserResponseDTO(1L, "João Silva", "joao@email.com", "joaosilva", LocalDateTime.now());
-        requestDTO = new UserRequestDTO("João Silva", "joao@email.com", "joaosilva", "senha123");
+        responseDTO = new UserResponseDTO(1L, "João Silva", "joao@email.com", "joaosilva", "Rua A, 123", LocalDateTime.now());
+        requestDTO = new UserRequestDTO("João Silva", "joao@email.com", "joaosilva", "senha123", "Rua A, 123");
         loginResponseDTO = new LoginResponseDTO("Login realizado com sucesso", 1L, "joaosilva", "joao@email.com", LocalDateTime.now());
     }
 
@@ -84,7 +84,7 @@ class UserControllerTest {
     @Test
     @DisplayName("POST /api/usuarios - deve retornar 400 com dados inválidos")
     void shouldReturn400InvalidData() throws Exception {
-        UserRequestDTO invalid = new UserRequestDTO("", "email-invalido", "login", "123");
+        UserRequestDTO invalid = new UserRequestDTO("", "email-invalido", "login", "123", "Rua A, 123");
 
         mockMvc.perform(post("/api/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)
