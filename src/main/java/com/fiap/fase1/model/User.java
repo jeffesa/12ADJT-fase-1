@@ -37,17 +37,23 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @NotBlank
+    @Size(max = 255)
+    @Column(nullable = false)
+    private String address;
+
     @NotNull
     @Column(nullable = false)
     private LocalDateTime lastModifiedDate;
 
     public User() {}
 
-    public User(String name, String email, String login, String password) {
+    public User(String name, String email, String login, String password, String address) {
         this.name = name;
         this.email = email;
         this.login = login;
         this.password = password;
+        this.address = address;
     }
 
     @PrePersist
@@ -69,6 +75,9 @@ public class User {
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
     public LocalDateTime getLastModifiedDate() { return lastModifiedDate; }
 

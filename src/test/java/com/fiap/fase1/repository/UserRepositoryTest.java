@@ -21,7 +21,7 @@ class UserRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        repository.save(new User("João Silva", "joao@email.com", "joaosilva", "senha_hash"));
+        repository.save(new User("João Silva", "joao@email.com", "joaosilva", "senha_hash", "Rua A, 123"));
     }
 
     @Test
