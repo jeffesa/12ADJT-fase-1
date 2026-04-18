@@ -1,5 +1,6 @@
 package com.fiap.fase1.controller;
 
+import com.fiap.fase1.dto.ChangePasswordDTO;
 import com.fiap.fase1.dto.LoginRequestDTO;
 import com.fiap.fase1.dto.LoginResponseDTO;
 import com.fiap.fase1.dto.UserRequestDTO;
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -84,6 +86,18 @@ public class UserController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Trocar senha", description = "Altera a senha de um usuário existente")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Senha alterada com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Senha atual incorreta ou dados inválidos"),
+        @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    })
+    @PatchMapping("/{id}/password")
+    public ResponseEntity<Map<String, String>> changePassword(@PathVariable Long id, @Valid @RequestBody ChangePasswordDTO dto) {
+        service.changePassword(id, dto);
+        return ResponseEntity.ok(Map.of("mensagem", "Senha alterada com sucesso"));
     }
 
     @Operation(summary = "Validar login", description = "Valida as credenciais de login do usuário")

@@ -2,6 +2,7 @@ package com.fiap.fase1.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.fase1.model.UserType;
+import com.fiap.fase1.dto.ChangePasswordDTO;
 import com.fiap.fase1.dto.LoginRequestDTO;
 import com.fiap.fase1.dto.LoginResponseDTO;
 import com.fiap.fase1.dto.UserRequestDTO;
@@ -191,5 +192,45 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginDTO)))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("PATCH /api/usuarios/{id}/password - deve trocar senha e retornar 200")
+    void shouldChangePassword() throws Exception {
+        ChangePasswordDTO dto = new ChangePasswordDTO("senha123", "novaSenha456");
+
+        mockMvc.perform(patch("/api/usuarios/1/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mensagem").value("Senha alterada com sucesso"));
+    }
+
+    @Test
+    @DisplayName("PATCH /api/usuarios/{id}/password - deve retornar 400 com senha atual incorreta")
+    void shouldReturn400WrongCurrentPassword() throws Exception {
+        ChangePasswordDTO dto = new ChangePasswordDTO("senhaErrada", "novaSenha456");
+
+        doThrow(new IllegalArgumentException("Senha atual incorreta"))
+                .when(service).changePassword(eq(1L), any());
+
+        mockMvc.perform(patch("/api/usuarios/1/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("PATCH /api/usuarios/{id}/password - deve retornar 404 para usuário inexistente")
+    void shouldReturn404ChangePasswordNonExistent() throws Exception {
+        ChangePasswordDTO dto = new ChangePasswordDTO("senha123", "novaSenha456");
+
+        doThrow(new UserNotFoundException(99L))
+                .when(service).changePassword(eq(99L), any());
+
+        mockMvc.perform(patch("/api/usuarios/99/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNotFound());
     }
 }

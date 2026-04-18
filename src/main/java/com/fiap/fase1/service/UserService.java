@@ -1,5 +1,6 @@
 package com.fiap.fase1.service;
 
+import com.fiap.fase1.dto.ChangePasswordDTO;
 import com.fiap.fase1.dto.LoginRequestDTO;
 import com.fiap.fase1.dto.LoginResponseDTO;
 import com.fiap.fase1.dto.UserRequestDTO;
@@ -78,6 +79,21 @@ public class UserService {
         user.setType(dto.type());
 
         return UserResponseDTO.fromEntity(repository.save(user));
+    }
+
+    public void changePassword(Long id, ChangePasswordDTO dto) {
+        log.info("Solicitação de troca de senha para o usuário com id: {}", id);
+        User user = repository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        if (!passwordEncoder.matches(dto.currentPassword(), user.getPassword())) {
+            log.warn("Troca de senha falhou - senha atual incorreta para o usuário com id: {}", id);
+            throw new IllegalArgumentException("Senha atual incorreta");
+        }
+
+        user.setPassword(passwordEncoder.encode(dto.newPassword()));
+        repository.save(user);
+        log.info("Senha alterada com sucesso para o usuário com id: {}", id);
     }
 
     public void delete(Long id) {
