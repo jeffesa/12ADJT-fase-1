@@ -195,11 +195,11 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("PATCH /api/v1/usuarios/{id}/password - deve trocar senha e retornar 200")
+    @DisplayName("PATCH /api/usuarios/{id}/password - deve trocar senha e retornar 200")
     void shouldChangePassword() throws Exception {
         ChangePasswordDTO dto = new ChangePasswordDTO("senha123", "novaSenha456");
 
-        mockMvc.perform(patch("/api/v1/usuarios/1/password")
+        mockMvc.perform(patch("/api/usuarios/1/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
@@ -207,28 +207,28 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("PATCH /api/v1/usuarios/{id}/password - deve retornar 400 com senha atual incorreta")
+    @DisplayName("PATCH /api/usuarios/{id}/password - deve retornar 400 com senha atual incorreta")
     void shouldReturn400WrongCurrentPassword() throws Exception {
         ChangePasswordDTO dto = new ChangePasswordDTO("senhaErrada", "novaSenha456");
 
         doThrow(new IllegalArgumentException("Senha atual incorreta"))
                 .when(service).changePassword(eq(1L), any());
 
-        mockMvc.perform(patch("/api/v1/usuarios/1/password")
+        mockMvc.perform(patch("/api/usuarios/1/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    @DisplayName("PATCH /api/v1/usuarios/{id}/password - deve retornar 404 para usuário inexistente")
+    @DisplayName("PATCH /api/usuarios/{id}/password - deve retornar 404 para usuário inexistente")
     void shouldReturn404ChangePasswordNonExistent() throws Exception {
         ChangePasswordDTO dto = new ChangePasswordDTO("senha123", "novaSenha456");
 
         doThrow(new UserNotFoundException(99L))
                 .when(service).changePassword(eq(99L), any());
 
-        mockMvc.perform(patch("/api/v1/usuarios/99/password")
+        mockMvc.perform(patch("/api/usuarios/99/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isNotFound());
