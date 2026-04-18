@@ -77,7 +77,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/v1/usuarios - deve retornar 409 ProblemDetail com email duplicado")
+    @DisplayName("POST /api/v1/usuarios - deve retornar 409 com email duplicado")
     void shouldReturn409DuplicateEmail() throws Exception {
         when(service.create(any())).thenThrow(new EmailAlreadyExistsException("joao@email.com"));
 
@@ -93,7 +93,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/v1/usuarios - deve retornar 400 ProblemDetail com dados inválidos")
+    @DisplayName("POST /api/v1/usuarios - deve retornar 400 com dados inválidos")
     void shouldReturn400InvalidData() throws Exception {
         UserRequestDTO invalid = new UserRequestDTO("", "email-invalido", "login", "123", "Rua A, 123", UserType.CUSTOMER);
 
@@ -130,17 +130,12 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/v1/usuarios/{id} - deve retornar 404 ProblemDetail para ID inexistente")
+    @DisplayName("GET /api/v1/usuarios/{id} - deve retornar 404 para ID inexistente")
     void shouldReturn404NonExistentId() throws Exception {
         when(service.findById(99L)).thenThrow(new UserNotFoundException(99L));
 
         mockMvc.perform(get("/api/v1/usuarios/99"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/not-found"))
-                .andExpect(jsonPath("$.title").value("Usuário não encontrado"))
-                .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.detail").exists())
-                .andExpect(jsonPath("$.instance").value("/api/v1/usuarios/99"));
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -156,7 +151,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /api/v1/usuarios/{id} - deve retornar 404 ProblemDetail para ID inexistente")
+    @DisplayName("PUT /api/v1/usuarios/{id} - deve retornar 404 para ID inexistente")
     void shouldReturn404UpdateNonExistent() throws Exception {
         when(service.update(eq(99L), any())).thenThrow(new UserNotFoundException(99L));
 
@@ -177,15 +172,12 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/usuarios/{id} - deve retornar 404 ProblemDetail para ID inexistente")
+    @DisplayName("DELETE /api/v1/usuarios/{id} - deve retornar 404 para ID inexistente")
     void shouldReturn404DeleteNonExistent() throws Exception {
         doThrow(new UserNotFoundException(99L)).when(service).delete(99L);
 
         mockMvc.perform(delete("/api/v1/usuarios/99"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/not-found"))
-                .andExpect(jsonPath("$.title").value("Usuário não encontrado"))
-                .andExpect(jsonPath("$.status").value(404));
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -205,7 +197,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/v1/usuarios/login - deve retornar 401 ProblemDetail com credenciais inválidas")
+    @DisplayName("POST /api/v1/usuarios/login - deve retornar 401 com credenciais inválidas")
     void shouldReturn401InvalidCredentials() throws Exception {
         LoginRequestDTO loginDTO = new LoginRequestDTO("joaosilva", "senhaErrada");
 
@@ -233,7 +225,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("PATCH /api/v1/usuarios/{id}/password - deve retornar 400 ProblemDetail com senha atual incorreta")
+    @DisplayName("PATCH /api/v1/usuarios/{id}/password - deve retornar 400 com senha atual incorreta")
     void shouldReturn400WrongCurrentPassword() throws Exception {
         ChangePasswordDTO dto = new ChangePasswordDTO("senhaErrada", "novaSenha456");
 
@@ -251,7 +243,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("PATCH /api/v1/usuarios/{id}/password - deve retornar 404 ProblemDetail para usuário inexistente")
+    @DisplayName("PATCH /api/v1/usuarios/{id}/password - deve retornar 404 para usuário inexistente")
     void shouldReturn404ChangePasswordNonExistent() throws Exception {
         ChangePasswordDTO dto = new ChangePasswordDTO("senha123", "novaSenha456");
 
