@@ -1,6 +1,7 @@
 package com.fiap.fase1.repository;
 
 import com.fiap.fase1.model.User;
+import com.fiap.fase1.model.UserType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ class UserRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        repository.save(new User("João Silva", "joao@email.com", "joaosilva", "senha_hash", "Rua A, 123"));
+        repository.save(new User("João Silva", "joao@email.com", "joaosilva", "senha_hash", "Rua A, 123", UserType.CUSTOMER));
     }
 
     @Test

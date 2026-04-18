@@ -42,7 +42,8 @@ public class UserService {
                 dto.email(),
                 dto.login(),
                 passwordEncoder.encode(dto.password()),
-                dto.address()
+                dto.address(),
+                dto.type()
         );
         return UserResponseDTO.fromEntity(repository.save(user));
     }
@@ -74,6 +75,7 @@ public class UserService {
         user.setLogin(dto.login());
         user.setPassword(passwordEncoder.encode(dto.password()));
         user.setAddress(dto.address());
+        user.setType(dto.type());
 
         return UserResponseDTO.fromEntity(repository.save(user));
     }

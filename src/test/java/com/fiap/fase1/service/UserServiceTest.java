@@ -1,6 +1,7 @@
 package com.fiap.fase1.service;
 
 import com.fiap.fase1.dto.LoginRequestDTO;
+import com.fiap.fase1.model.UserType;
 import com.fiap.fase1.dto.LoginResponseDTO;
 import com.fiap.fase1.dto.UserRequestDTO;
 import com.fiap.fase1.dto.UserResponseDTO;
@@ -45,7 +46,7 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = new User("João Silva", "joao@email.com", "joaosilva", "senha_hash", "Rua A, 123");
+        user = new User("João Silva", "joao@email.com", "joaosilva", "senha_hash", "Rua A, 123", UserType.CUSTOMER);
         try {
             var field = User.class.getDeclaredField("id");
             field.setAccessible(true);
@@ -58,7 +59,7 @@ class UserServiceTest {
             throw new RuntimeException("Falha ao setar campos via reflection", e);
         }
 
-        requestDTO = new UserRequestDTO("João Silva", "joao@email.com", "joaosilva", "senha123", "Rua A, 123");
+        requestDTO = new UserRequestDTO("João Silva", "joao@email.com", "joaosilva", "senha123", "Rua A, 123", UserType.CUSTOMER);
     }
 
     @Test
@@ -144,7 +145,7 @@ class UserServiceTest {
     @Test
     @DisplayName("Deve lançar exceção ao atualizar com email de outro usuário")
     void shouldThrowExceptionUpdateDuplicateEmail() {
-        User otherUser = new User("Outro", "joao@email.com", "outro", "hash", "Rua A, 123");
+        User otherUser = new User("Outro", "joao@email.com", "outro", "hash", "Rua A, 123", UserType.CUSTOMER);
         try {
             var field = User.class.getDeclaredField("id");
             field.setAccessible(true);
@@ -162,7 +163,7 @@ class UserServiceTest {
     @Test
     @DisplayName("Deve lançar exceção ao atualizar com login de outro usuário")
     void shouldThrowExceptionUpdateDuplicateLogin() {
-        User otherUser = new User("Outro", "outro@email.com", "joaosilva", "hash", "Rua A, 123");
+        User otherUser = new User("Outro", "outro@email.com", "joaosilva", "hash", "Rua A, 123", UserType.CUSTOMER);
         try {
             var field = User.class.getDeclaredField("id");
             field.setAccessible(true);
