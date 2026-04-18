@@ -5,13 +5,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
+import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
+import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,68 +20,88 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    private Map<String, Object> buildErrorResponse(HttpStatus status, String message, String path) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", status.value());
-        body.put("erro", message);
-        body.put("path", path);
-        return body;
-    }
+    private static final URI TYPE_NOT_FOUND = URI.create("https://api.fiap.com/errors/not-found");
+    private static final URI TYPE_CONFLICT = URI.create("https://api.fiap.com/errors/conflict");
+    private static final URI TYPE_UNAUTHORIZED = URI.create("https://api.fiap.com/errors/unauthorized");
+    private static final URI TYPE_VALIDATION = URI.create("https://api.fiap.com/errors/validation");
+    private static final URI TYPE_BAD_REQUEST = URI.create("https://api.fiap.com/errors/bad-request");
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleUserNotFound(UserNotFoundException ex, HttpServletRequest request) {
+    public ProblemDetail handleUserNotFound(UserNotFoundException ex, HttpServletRequest request) {
         log.warn("Usuário não encontrado: {} | Path: {}", ex.getMessage(), request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI()));
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Usuário não encontrado");
+        problem.setType(TYPE_NOT_FOUND);
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
     }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<Map<String, Object>> handleEmailAlreadyExists(EmailAlreadyExistsException ex, HttpServletRequest request) {
+    public ProblemDetail handleEmailAlreadyExists(EmailAlreadyExistsException ex, HttpServletRequest request) {
         log.warn("Email duplicado: {} | Path: {}", ex.getMessage(), request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI()));
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+        problem.setTitle("Email já cadastrado");
+        problem.setType(TYPE_CONFLICT);
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
     }
 
     @ExceptionHandler(LoginAlreadyExistsException.class)
-    public ResponseEntity<Map<String, Object>> handleLoginAlreadyExists(LoginAlreadyExistsException ex, HttpServletRequest request) {
+    public ProblemDetail handleLoginAlreadyExists(LoginAlreadyExistsException ex, HttpServletRequest request) {
         log.warn("Login duplicado: {} | Path: {}", ex.getMessage(), request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI()));
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+        problem.setTitle("Login já cadastrado");
+        problem.setType(TYPE_CONFLICT);
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidCredentials(InvalidCredentialsException ex, HttpServletRequest request) {
+    public ProblemDetail handleInvalidCredentials(InvalidCredentialsException ex, HttpServletRequest request) {
         log.warn("Credenciais inválidas | Path: {}", request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(buildErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), request.getRequestURI()));
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        problem.setTitle("Credenciais inválidas");
+        problem.setType(TYPE_UNAUTHORIZED);
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    public ProblemDetail handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
         String errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining("; "));
         log.warn("Validação falhou: {} | Path: {}", errors, request.getRequestURI());
-        Map<String, Object> body = buildErrorResponse(HttpStatus.BAD_REQUEST, "Erro de validação", request.getRequestURI());
+
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Erro de validação");
+        problem.setTitle("Dados inválidos");
+        problem.setType(TYPE_VALIDATION);
+        problem.setInstance(URI.create(request.getRequestURI()));
+
         Map<String, String> fieldErrors = new LinkedHashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 fieldErrors.put(error.getField(), error.getDefaultMessage()));
-        body.put("campos", fieldErrors);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+        problem.setProperty("campos", fieldErrors);
+        return problem;
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<Map<String, Object>> handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest request) {
+    public ProblemDetail handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest request) {
         log.error("Violação de integridade de dados: {} | Path: {}", ex.getMostSpecificCause().getMessage(), request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(buildErrorResponse(HttpStatus.CONFLICT, "Violação de integridade de dados", request.getRequestURI()));
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "Violação de integridade de dados");
+        problem.setTitle("Conflito de dados");
+        problem.setType(TYPE_CONFLICT);
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest request) {
+    public ProblemDetail handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest request) {
         log.warn("Argumento inválido: {} | Path: {}", ex.getMessage(), request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI()));
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problem.setTitle("Requisição inválida");
+        problem.setType(TYPE_BAD_REQUEST);
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
     }
 }

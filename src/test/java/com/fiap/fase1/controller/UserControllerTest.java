@@ -10,6 +10,7 @@ import com.fiap.fase1.dto.UserResponseDTO;
 import com.fiap.fase1.dto.UserUpdateDTO;
 import com.fiap.fase1.exception.InvalidCredentialsException;
 import com.fiap.fase1.exception.EmailAlreadyExistsException;
+import com.fiap.fase1.exception.LoginAlreadyExistsException;
 import com.fiap.fase1.exception.UserNotFoundException;
 import com.fiap.fase1.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -76,25 +77,36 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/v1/usuarios - deve retornar 409 com email duplicado")
+    @DisplayName("POST /api/v1/usuarios - deve retornar 409 ProblemDetail com email duplicado")
     void shouldReturn409DuplicateEmail() throws Exception {
         when(service.create(any())).thenThrow(new EmailAlreadyExistsException("joao@email.com"));
 
         mockMvc.perform(post("/api/v1/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
-                .andExpect(status().isConflict());
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/conflict"))
+                .andExpect(jsonPath("$.title").value("Email já cadastrado"))
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.detail").exists())
+                .andExpect(jsonPath("$.instance").value("/api/v1/usuarios"));
     }
 
     @Test
-    @DisplayName("POST /api/v1/usuarios - deve retornar 400 com dados inválidos")
+    @DisplayName("POST /api/v1/usuarios - deve retornar 400 ProblemDetail com dados inválidos")
     void shouldReturn400InvalidData() throws Exception {
         UserRequestDTO invalid = new UserRequestDTO("", "email-invalido", "login", "123", "Rua A, 123", UserType.CUSTOMER);
 
         mockMvc.perform(post("/api/v1/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalid)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/validation"))
+                .andExpect(jsonPath("$.title").value("Dados inválidos"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.detail").value("Erro de validação"))
+                .andExpect(jsonPath("$.instance").value("/api/v1/usuarios"))
+                .andExpect(jsonPath("$.campos").exists());
     }
 
     @Test
@@ -118,12 +130,17 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/v1/usuarios/{id} - deve retornar 404 para ID inexistente")
+    @DisplayName("GET /api/v1/usuarios/{id} - deve retornar 404 ProblemDetail para ID inexistente")
     void shouldReturn404NonExistentId() throws Exception {
         when(service.findById(99L)).thenThrow(new UserNotFoundException(99L));
 
         mockMvc.perform(get("/api/v1/usuarios/99"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/not-found"))
+                .andExpect(jsonPath("$.title").value("Usuário não encontrado"))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.detail").exists())
+                .andExpect(jsonPath("$.instance").value("/api/v1/usuarios/99"));
     }
 
     @Test
@@ -139,14 +156,17 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /api/v1/usuarios/{id} - deve retornar 404 para ID inexistente")
+    @DisplayName("PUT /api/v1/usuarios/{id} - deve retornar 404 ProblemDetail para ID inexistente")
     void shouldReturn404UpdateNonExistent() throws Exception {
         when(service.update(eq(99L), any())).thenThrow(new UserNotFoundException(99L));
 
         mockMvc.perform(put("/api/v1/usuarios/99")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDTO)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/not-found"))
+                .andExpect(jsonPath("$.title").value("Usuário não encontrado"))
+                .andExpect(jsonPath("$.status").value(404));
     }
 
     @Test
@@ -157,12 +177,15 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/usuarios/{id} - deve retornar 404 para ID inexistente")
+    @DisplayName("DELETE /api/v1/usuarios/{id} - deve retornar 404 ProblemDetail para ID inexistente")
     void shouldReturn404DeleteNonExistent() throws Exception {
         doThrow(new UserNotFoundException(99L)).when(service).delete(99L);
 
         mockMvc.perform(delete("/api/v1/usuarios/99"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/not-found"))
+                .andExpect(jsonPath("$.title").value("Usuário não encontrado"))
+                .andExpect(jsonPath("$.status").value(404));
     }
 
     @Test
@@ -182,7 +205,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/v1/usuarios/login - deve retornar 401 com credenciais inválidas")
+    @DisplayName("POST /api/v1/usuarios/login - deve retornar 401 ProblemDetail com credenciais inválidas")
     void shouldReturn401InvalidCredentials() throws Exception {
         LoginRequestDTO loginDTO = new LoginRequestDTO("joaosilva", "senhaErrada");
 
@@ -191,7 +214,10 @@ class UserControllerTest {
         mockMvc.perform(post("/api/v1/usuarios/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginDTO)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/unauthorized"))
+                .andExpect(jsonPath("$.title").value("Credenciais inválidas"))
+                .andExpect(jsonPath("$.status").value(401));
     }
 
     @Test
@@ -207,7 +233,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("PATCH /api/v1/usuarios/{id}/password - deve retornar 400 com senha atual incorreta")
+    @DisplayName("PATCH /api/v1/usuarios/{id}/password - deve retornar 400 ProblemDetail com senha atual incorreta")
     void shouldReturn400WrongCurrentPassword() throws Exception {
         ChangePasswordDTO dto = new ChangePasswordDTO("senhaErrada", "novaSenha456");
 
@@ -217,11 +243,15 @@ class UserControllerTest {
         mockMvc.perform(patch("/api/v1/usuarios/1/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/bad-request"))
+                .andExpect(jsonPath("$.title").value("Requisição inválida"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.detail").value("Senha atual incorreta"));
     }
 
     @Test
-    @DisplayName("PATCH /api/v1/usuarios/{id}/password - deve retornar 404 para usuário inexistente")
+    @DisplayName("PATCH /api/v1/usuarios/{id}/password - deve retornar 404 ProblemDetail para usuário inexistente")
     void shouldReturn404ChangePasswordNonExistent() throws Exception {
         ChangePasswordDTO dto = new ChangePasswordDTO("senha123", "novaSenha456");
 
@@ -231,6 +261,23 @@ class UserControllerTest {
         mockMvc.perform(patch("/api/v1/usuarios/99/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/not-found"))
+                .andExpect(jsonPath("$.title").value("Usuário não encontrado"))
+                .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/usuarios - deve retornar 409 ProblemDetail com login duplicado")
+    void shouldReturn409DuplicateLogin() throws Exception {
+        when(service.create(any())).thenThrow(new LoginAlreadyExistsException("joaosilva"));
+
+        mockMvc.perform(post("/api/v1/usuarios")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/conflict"))
+                .andExpect(jsonPath("$.title").value("Login já cadastrado"))
+                .andExpect(jsonPath("$.status").value(409));
     }
 }
