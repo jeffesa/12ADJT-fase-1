@@ -451,37 +451,37 @@ Descrição
 
 POST
 
-`/api/usuarios`
+`/api/v1/usuarios`
 
 Criar usuário
 
 GET
 
-`/api/usuarios`
+`/api/v1/usuarios`
 
 Listar todos
 
 GET
 
-`/api/usuarios/{id}`
+`/api/v1/usuarios/{id}`
 
 Buscar por ID
 
 PUT
 
-`/api/usuarios/{id}`
+`/api/v1/usuarios/{id}`
 
 Atualizar usuário
 
 DELETE
 
-`/api/usuarios/{id}`
+`/api/v1/usuarios/{id}`
 
 Deletar usuário
 
 POST
 
-`/api/usuarios/login`
+`/api/v1/usuarios/login`
 
 Validar login
 
