@@ -14,7 +14,7 @@
       "name": "Criar Usuario",
       "request": {
         "method": "POST",
-        "url": "{{baseUrl}}/api/usuarios",
+        "url": "{{baseUrl}}/api/v1/usuarios",
         "header": [
           {
             "key": "Content-Type",
@@ -31,7 +31,7 @@
       "name": "Listar Usuarios",
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/api/usuarios",
+        "url": "{{baseUrl}}/api/v1/usuarios",
         "header": []
       }
     },
@@ -39,7 +39,7 @@
       "name": "Buscar Usuario por ID",
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/api/usuarios/1",
+        "url": "{{baseUrl}}/api/v1/usuarios/1",
         "header": []
       }
     },
@@ -47,7 +47,7 @@
       "name": "Atualizar Usuario",
       "request": {
         "method": "PUT",
-        "url": "{{baseUrl}}/api/usuarios/1",
+        "url": "{{baseUrl}}/api/v1/usuarios/1",
         "header": [
           {
             "key": "Content-Type",
@@ -64,7 +64,7 @@
       "name": "Deletar Usuario",
       "request": {
         "method": "DELETE",
-        "url": "{{baseUrl}}/api/usuarios/1",
+        "url": "{{baseUrl}}/api/v1/usuarios/1",
         "header": []
       }
     },
@@ -72,7 +72,7 @@
       "name": "Login",
       "request": {
         "method": "POST",
-        "url": "{{baseUrl}}/api/usuarios/login",
+        "url": "{{baseUrl}}/api/v1/usuarios/login",
         "header": [
           {
             "key": "Content-Type",
@@ -89,7 +89,7 @@
       "name": "Login - Credenciais Inválidas",
       "request": {
         "method": "POST",
-        "url": "{{baseUrl}}/api/usuarios/login",
+        "url": "{{baseUrl}}/api/v1/usuarios/login",
         "header": [
           {
             "key": "Content-Type",

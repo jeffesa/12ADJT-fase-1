@@ -62,11 +62,11 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/usuarios - deve criar usuário e retornar 201")
+    @DisplayName("POST /api/v1/usuarios - deve criar usuário e retornar 201")
     void shouldCreateUser() throws Exception {
         when(service.create(any())).thenReturn(responseDTO);
 
-        mockMvc.perform(post("/api/usuarios")
+        mockMvc.perform(post("/api/v1/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isCreated())
@@ -76,62 +76,62 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/usuarios - deve retornar 409 com email duplicado")
+    @DisplayName("POST /api/v1/usuarios - deve retornar 409 com email duplicado")
     void shouldReturn409DuplicateEmail() throws Exception {
         when(service.create(any())).thenThrow(new EmailAlreadyExistsException("joao@email.com"));
 
-        mockMvc.perform(post("/api/usuarios")
+        mockMvc.perform(post("/api/v1/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isConflict());
     }
 
     @Test
-    @DisplayName("POST /api/usuarios - deve retornar 400 com dados inválidos")
+    @DisplayName("POST /api/v1/usuarios - deve retornar 400 com dados inválidos")
     void shouldReturn400InvalidData() throws Exception {
         UserRequestDTO invalid = new UserRequestDTO("", "email-invalido", "login", "123", "Rua A, 123", UserType.CUSTOMER);
 
-        mockMvc.perform(post("/api/usuarios")
+        mockMvc.perform(post("/api/v1/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalid)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    @DisplayName("GET /api/usuarios - deve listar usuários e retornar 200")
+    @DisplayName("GET /api/v1/usuarios - deve listar usuários e retornar 200")
     void shouldListUsers() throws Exception {
         when(service.findAll()).thenReturn(List.of(responseDTO));
 
-        mockMvc.perform(get("/api/usuarios"))
+        mockMvc.perform(get("/api/v1/usuarios"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].email").value("joao@email.com"));
     }
 
     @Test
-    @DisplayName("GET /api/usuarios/{id} - deve retornar usuário por ID")
+    @DisplayName("GET /api/v1/usuarios/{id} - deve retornar usuário por ID")
     void shouldFindById() throws Exception {
         when(service.findById(1L)).thenReturn(responseDTO);
 
-        mockMvc.perform(get("/api/usuarios/1"))
+        mockMvc.perform(get("/api/v1/usuarios/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
-    @DisplayName("GET /api/usuarios/{id} - deve retornar 404 para ID inexistente")
+    @DisplayName("GET /api/v1/usuarios/{id} - deve retornar 404 para ID inexistente")
     void shouldReturn404NonExistentId() throws Exception {
         when(service.findById(99L)).thenThrow(new UserNotFoundException(99L));
 
-        mockMvc.perform(get("/api/usuarios/99"))
+        mockMvc.perform(get("/api/v1/usuarios/99"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    @DisplayName("PUT /api/usuarios/{id} - deve atualizar usuário e retornar 200")
+    @DisplayName("PUT /api/v1/usuarios/{id} - deve atualizar usuário e retornar 200")
     void shouldUpdateUser() throws Exception {
         when(service.update(eq(1L), any())).thenReturn(responseDTO);
 
-        mockMvc.perform(put("/api/usuarios/1")
+        mockMvc.perform(put("/api/v1/usuarios/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isOk())
@@ -139,40 +139,40 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /api/usuarios/{id} - deve retornar 404 para ID inexistente")
+    @DisplayName("PUT /api/v1/usuarios/{id} - deve retornar 404 para ID inexistente")
     void shouldReturn404UpdateNonExistent() throws Exception {
         when(service.update(eq(99L), any())).thenThrow(new UserNotFoundException(99L));
 
-        mockMvc.perform(put("/api/usuarios/99")
+        mockMvc.perform(put("/api/v1/usuarios/99")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    @DisplayName("DELETE /api/usuarios/{id} - deve deletar usuário e retornar 204")
+    @DisplayName("DELETE /api/v1/usuarios/{id} - deve deletar usuário e retornar 204")
     void shouldDeleteUser() throws Exception {
-        mockMvc.perform(delete("/api/usuarios/1"))
+        mockMvc.perform(delete("/api/v1/usuarios/1"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    @DisplayName("DELETE /api/usuarios/{id} - deve retornar 404 para ID inexistente")
+    @DisplayName("DELETE /api/v1/usuarios/{id} - deve retornar 404 para ID inexistente")
     void shouldReturn404DeleteNonExistent() throws Exception {
         doThrow(new UserNotFoundException(99L)).when(service).delete(99L);
 
-        mockMvc.perform(delete("/api/usuarios/99"))
+        mockMvc.perform(delete("/api/v1/usuarios/99"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    @DisplayName("POST /api/usuarios/login - deve realizar login e retornar 200")
+    @DisplayName("POST /api/v1/usuarios/login - deve realizar login e retornar 200")
     void shouldLogin() throws Exception {
         LoginRequestDTO loginDTO = new LoginRequestDTO("joaosilva", "senha123");
 
         when(service.login(any())).thenReturn(loginResponseDTO);
 
-        mockMvc.perform(post("/api/usuarios/login")
+        mockMvc.perform(post("/api/v1/usuarios/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginDTO)))
                 .andExpect(status().isOk())
@@ -182,24 +182,24 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/usuarios/login - deve retornar 401 com credenciais inválidas")
+    @DisplayName("POST /api/v1/usuarios/login - deve retornar 401 com credenciais inválidas")
     void shouldReturn401InvalidCredentials() throws Exception {
         LoginRequestDTO loginDTO = new LoginRequestDTO("joaosilva", "senhaErrada");
 
         when(service.login(any())).thenThrow(new InvalidCredentialsException());
 
-        mockMvc.perform(post("/api/usuarios/login")
+        mockMvc.perform(post("/api/v1/usuarios/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginDTO)))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    @DisplayName("PATCH /api/usuarios/{id}/password - deve trocar senha e retornar 200")
+    @DisplayName("PATCH /api/v1/usuarios/{id}/password - deve trocar senha e retornar 200")
     void shouldChangePassword() throws Exception {
         ChangePasswordDTO dto = new ChangePasswordDTO("senha123", "novaSenha456");
 
-        mockMvc.perform(patch("/api/usuarios/1/password")
+        mockMvc.perform(patch("/api/v1/usuarios/1/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
@@ -207,28 +207,28 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("PATCH /api/usuarios/{id}/password - deve retornar 400 com senha atual incorreta")
+    @DisplayName("PATCH /api/v1/usuarios/{id}/password - deve retornar 400 com senha atual incorreta")
     void shouldReturn400WrongCurrentPassword() throws Exception {
         ChangePasswordDTO dto = new ChangePasswordDTO("senhaErrada", "novaSenha456");
 
         doThrow(new IllegalArgumentException("Senha atual incorreta"))
                 .when(service).changePassword(eq(1L), any());
 
-        mockMvc.perform(patch("/api/usuarios/1/password")
+        mockMvc.perform(patch("/api/v1/usuarios/1/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    @DisplayName("PATCH /api/usuarios/{id}/password - deve retornar 404 para usuário inexistente")
+    @DisplayName("PATCH /api/v1/usuarios/{id}/password - deve retornar 404 para usuário inexistente")
     void shouldReturn404ChangePasswordNonExistent() throws Exception {
         ChangePasswordDTO dto = new ChangePasswordDTO("senha123", "novaSenha456");
 
         doThrow(new UserNotFoundException(99L))
                 .when(service).changePassword(eq(99L), any());
 
-        mockMvc.perform(patch("/api/usuarios/99/password")
+        mockMvc.perform(patch("/api/v1/usuarios/99/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isNotFound());
