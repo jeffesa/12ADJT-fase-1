@@ -5,6 +5,7 @@ import com.fiap.fase1.model.UserType;
 import com.fiap.fase1.dto.LoginResponseDTO;
 import com.fiap.fase1.dto.UserRequestDTO;
 import com.fiap.fase1.dto.UserResponseDTO;
+import com.fiap.fase1.dto.UserUpdateDTO;
 import com.fiap.fase1.exception.InvalidCredentialsException;
 import com.fiap.fase1.exception.EmailAlreadyExistsException;
 import com.fiap.fase1.exception.LoginAlreadyExistsException;
@@ -43,6 +44,7 @@ class UserServiceTest {
 
     private User user;
     private UserRequestDTO requestDTO;
+    private UserUpdateDTO updateDTO;
 
     @BeforeEach
     void setUp() {
@@ -60,6 +62,7 @@ class UserServiceTest {
         }
 
         requestDTO = new UserRequestDTO("João Silva", "joao@email.com", "joaosilva", "senha123", "Rua A, 123", UserType.CUSTOMER);
+        updateDTO = new UserUpdateDTO("João Silva", "joao@email.com", "joaosilva", "Rua A, 123", UserType.CUSTOMER);
     }
 
     @Test
@@ -131,12 +134,11 @@ class UserServiceTest {
     @DisplayName("Deve atualizar usuário com sucesso")
     void shouldUpdateUser() {
         when(repository.findById(1L)).thenReturn(Optional.of(user));
-        when(repository.findByEmail(requestDTO.email())).thenReturn(Optional.of(user));
-        when(repository.findByLogin(requestDTO.login())).thenReturn(Optional.of(user));
-        when(passwordEncoder.encode(anyString())).thenReturn("nova_senha_hash");
+        when(repository.findByEmail(updateDTO.email())).thenReturn(Optional.of(user));
+        when(repository.findByLogin(updateDTO.login())).thenReturn(Optional.of(user));
         when(repository.save(any(User.class))).thenReturn(user);
 
-        UserResponseDTO response = service.update(1L, requestDTO);
+        UserResponseDTO response = service.update(1L, updateDTO);
 
         assertNotNull(response);
         verify(repository).save(any(User.class));
@@ -155,9 +157,9 @@ class UserServiceTest {
         }
 
         when(repository.findById(1L)).thenReturn(Optional.of(user));
-        when(repository.findByEmail(requestDTO.email())).thenReturn(Optional.of(otherUser));
+        when(repository.findByEmail(updateDTO.email())).thenReturn(Optional.of(otherUser));
 
-        assertThrows(EmailAlreadyExistsException.class, () -> service.update(1L, requestDTO));
+        assertThrows(EmailAlreadyExistsException.class, () -> service.update(1L, updateDTO));
     }
 
     @Test
@@ -173,10 +175,10 @@ class UserServiceTest {
         }
 
         when(repository.findById(1L)).thenReturn(Optional.of(user));
-        when(repository.findByEmail(requestDTO.email())).thenReturn(Optional.of(user));
-        when(repository.findByLogin(requestDTO.login())).thenReturn(Optional.of(otherUser));
+        when(repository.findByEmail(updateDTO.email())).thenReturn(Optional.of(user));
+        when(repository.findByLogin(updateDTO.login())).thenReturn(Optional.of(otherUser));
 
-        assertThrows(LoginAlreadyExistsException.class, () -> service.update(1L, requestDTO));
+        assertThrows(LoginAlreadyExistsException.class, () -> service.update(1L, updateDTO));
     }
 
     @Test
@@ -184,7 +186,7 @@ class UserServiceTest {
     void shouldThrowExceptionUpdateNonExistent() {
         when(repository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> service.update(99L, requestDTO));
+        assertThrows(UserNotFoundException.class, () -> service.update(99L, updateDTO));
     }
 
     @Test

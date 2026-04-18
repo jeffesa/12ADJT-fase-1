@@ -6,6 +6,7 @@ import com.fiap.fase1.dto.LoginRequestDTO;
 import com.fiap.fase1.dto.LoginResponseDTO;
 import com.fiap.fase1.dto.UserRequestDTO;
 import com.fiap.fase1.dto.UserResponseDTO;
+import com.fiap.fase1.dto.UserUpdateDTO;
 import com.fiap.fase1.exception.InvalidCredentialsException;
 import com.fiap.fase1.exception.EmailAlreadyExistsException;
 import com.fiap.fase1.exception.UserNotFoundException;
@@ -48,12 +49,14 @@ class UserControllerTest {
 
     private UserResponseDTO responseDTO;
     private UserRequestDTO requestDTO;
+    private UserUpdateDTO updateDTO;
     private LoginResponseDTO loginResponseDTO;
 
     @BeforeEach
     void setUp() {
         responseDTO = new UserResponseDTO(1L, "João Silva", "joao@email.com", "joaosilva", "Rua A, 123", UserType.CUSTOMER, LocalDateTime.now());
         requestDTO = new UserRequestDTO("João Silva", "joao@email.com", "joaosilva", "senha123", "Rua A, 123", UserType.CUSTOMER);
+        updateDTO = new UserUpdateDTO("João Silva", "joao@email.com", "joaosilva", "Rua A, 123", UserType.CUSTOMER);
         loginResponseDTO = new LoginResponseDTO("Login realizado com sucesso", 1L, "joaosilva", "joao@email.com", LocalDateTime.now());
     }
 
@@ -129,7 +132,7 @@ class UserControllerTest {
 
         mockMvc.perform(put("/api/usuarios/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
+                        .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("joao@email.com"));
     }
@@ -141,7 +144,7 @@ class UserControllerTest {
 
         mockMvc.perform(put("/api/usuarios/99")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
+                        .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isNotFound());
     }
 

@@ -4,6 +4,7 @@ import com.fiap.fase1.dto.LoginRequestDTO;
 import com.fiap.fase1.dto.LoginResponseDTO;
 import com.fiap.fase1.dto.UserRequestDTO;
 import com.fiap.fase1.dto.UserResponseDTO;
+import com.fiap.fase1.dto.UserUpdateDTO;
 import com.fiap.fase1.exception.InvalidCredentialsException;
 import com.fiap.fase1.exception.EmailAlreadyExistsException;
 import com.fiap.fase1.exception.LoginAlreadyExistsException;
@@ -58,7 +59,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(id));
     }
 
-    public UserResponseDTO update(Long id, UserRequestDTO dto) {
+    public UserResponseDTO update(Long id, UserUpdateDTO dto) {
         User user = repository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -73,7 +74,6 @@ public class UserService {
         user.setName(dto.name());
         user.setEmail(dto.email());
         user.setLogin(dto.login());
-        user.setPassword(passwordEncoder.encode(dto.password()));
         user.setAddress(dto.address());
         user.setType(dto.type());
 
