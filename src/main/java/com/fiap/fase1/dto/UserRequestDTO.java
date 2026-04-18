@@ -3,7 +3,9 @@ package com.fiap.fase1.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import com.fiap.fase1.model.UserType;
 
 @Schema(description = "Dados para criação ou atualização de usuário")
 public record UserRequestDTO(
@@ -30,5 +32,9 @@ public record UserRequestDTO(
         @NotBlank(message = "O endereço é obrigatório")
         @Size(max = 255, message = "O endereço deve ter no máximo 255 caracteres")
         @Schema(description = "Endereço do usuário", example = "Rua das Flores, 123")
-        String address
+        String address,
+
+        @NotNull(message = "O tipo de usuário é obrigatório")
+        @Schema(description = "Tipo de usuário", example = "CUSTOMER")
+        UserType type
 ) {}
