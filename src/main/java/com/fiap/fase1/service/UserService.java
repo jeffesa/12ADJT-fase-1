@@ -1,9 +1,11 @@
 package com.fiap.fase1.service;
 
+import com.fiap.fase1.dto.ChangePasswordDTO;
 import com.fiap.fase1.dto.LoginRequestDTO;
 import com.fiap.fase1.dto.LoginResponseDTO;
 import com.fiap.fase1.dto.UserRequestDTO;
 import com.fiap.fase1.dto.UserResponseDTO;
+import com.fiap.fase1.dto.UserUpdateDTO;
 import com.fiap.fase1.exception.InvalidCredentialsException;
 import com.fiap.fase1.exception.EmailAlreadyExistsException;
 import com.fiap.fase1.exception.LoginAlreadyExistsException;
@@ -58,7 +60,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(id));
     }
 
-    public UserResponseDTO update(Long id, UserRequestDTO dto) {
+    public UserResponseDTO update(Long id, UserUpdateDTO dto) {
         User user = repository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -73,11 +75,25 @@ public class UserService {
         user.setName(dto.name());
         user.setEmail(dto.email());
         user.setLogin(dto.login());
-        user.setPassword(passwordEncoder.encode(dto.password()));
         user.setAddress(dto.address());
         user.setType(dto.type());
 
         return UserResponseDTO.fromEntity(repository.save(user));
+    }
+
+    public void changePassword(Long id, ChangePasswordDTO dto) {
+        log.info("Solicitação de troca de senha para o usuário com id: {}", id);
+        User user = repository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        if (!passwordEncoder.matches(dto.currentPassword(), user.getPassword())) {
+            log.warn("Troca de senha falhou - senha atual incorreta para o usuário com id: {}", id);
+            throw new IllegalArgumentException("Senha atual incorreta");
+        }
+
+        user.setPassword(passwordEncoder.encode(dto.newPassword()));
+        repository.save(user);
+        log.info("Senha alterada com sucesso para o usuário com id: {}", id);
     }
 
     public void delete(Long id) {
