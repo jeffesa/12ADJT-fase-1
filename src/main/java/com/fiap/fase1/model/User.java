@@ -43,17 +43,23 @@ public class User {
     private String address;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserType type;
+
+    @NotNull
     @Column(nullable = false)
     private LocalDateTime lastModifiedDate;
 
     public User() {}
 
-    public User(String name, String email, String login, String password, String address) {
+    public User(String name, String email, String login, String password, String address, UserType type) {
         this.name = name;
         this.email = email;
         this.login = login;
         this.password = password;
         this.address = address;
+        this.type = type;
     }
 
     @PrePersist
@@ -78,6 +84,9 @@ public class User {
 
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
+
+    public UserType getType() { return type; }
+    public void setType(UserType type) { this.type = type; }
 
     public LocalDateTime getLastModifiedDate() { return lastModifiedDate; }
 
