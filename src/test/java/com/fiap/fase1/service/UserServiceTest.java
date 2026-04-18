@@ -1,5 +1,6 @@
 package com.fiap.fase1.service;
 
+import com.fiap.fase1.dto.ChangePasswordDTO;
 import com.fiap.fase1.dto.LoginRequestDTO;
 import com.fiap.fase1.model.UserType;
 import com.fiap.fase1.dto.LoginResponseDTO;
@@ -242,5 +243,42 @@ class UserServiceTest {
         when(passwordEncoder.matches("senhaErrada", "senha_hash")).thenReturn(false);
 
         assertThrows(InvalidCredentialsException.class, () -> service.login(loginDTO));
+    }
+
+    @Test
+    @DisplayName("Deve trocar senha com sucesso")
+    void shouldChangePassword() {
+        ChangePasswordDTO dto = new ChangePasswordDTO("senha123", "novaSenha456");
+
+        when(repository.findById(1L)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("senha123", "senha_hash")).thenReturn(true);
+        when(passwordEncoder.encode("novaSenha456")).thenReturn("nova_senha_hash");
+        when(repository.save(any(User.class))).thenReturn(user);
+
+        service.changePassword(1L, dto);
+
+        verify(repository).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao trocar senha com senha atual incorreta")
+    void shouldThrowExceptionChangePasswordWrongCurrent() {
+        ChangePasswordDTO dto = new ChangePasswordDTO("senhaErrada", "novaSenha456");
+
+        when(repository.findById(1L)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("senhaErrada", "senha_hash")).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class, () -> service.changePassword(1L, dto));
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao trocar senha de usuário inexistente")
+    void shouldThrowExceptionChangePasswordNonExistent() {
+        ChangePasswordDTO dto = new ChangePasswordDTO("senha123", "novaSenha456");
+
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> service.changePassword(99L, dto));
     }
 }
