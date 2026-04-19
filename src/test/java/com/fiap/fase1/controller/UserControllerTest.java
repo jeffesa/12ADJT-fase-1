@@ -289,6 +289,71 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("GET /api/v1/usuarios - deve retornar lista vazia")
+    void shouldReturnEmptyList() throws Exception {
+        when(service.findAll()).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/v1/usuarios"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    @DisplayName("PUT /api/v1/usuarios/{id} - deve retornar 409 com email de outro usuário")
+    void shouldReturn409UpdateDuplicateEmail() throws Exception {
+        when(service.update(eq(1L), any())).thenThrow(new EmailAlreadyExistsException("joao@email.com"));
+
+        mockMvc.perform(put("/api/v1/usuarios/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDTO)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/conflict"))
+                .andExpect(jsonPath("$.title").value("Email já cadastrado"))
+                .andExpect(jsonPath("$.status").value(409));
+    }
+
+    @Test
+    @DisplayName("PUT /api/v1/usuarios/{id} - deve retornar 409 com login de outro usuário")
+    void shouldReturn409UpdateDuplicateLogin() throws Exception {
+        when(service.update(eq(1L), any())).thenThrow(new LoginAlreadyExistsException("joaosilva"));
+
+        mockMvc.perform(put("/api/v1/usuarios/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDTO)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/conflict"))
+                .andExpect(jsonPath("$.title").value("Login já cadastrado"))
+                .andExpect(jsonPath("$.status").value(409));
+    }
+
+    @Test
+    @DisplayName("PUT /api/v1/usuarios/{id} - deve retornar 400 com dados inválidos")
+    void shouldReturn400UpdateInvalidData() throws Exception {
+        UserUpdateDTO invalid = new UserUpdateDTO("", "email-invalido", "login", "Rua A", UserType.CUSTOMER);
+
+        mockMvc.perform(put("/api/v1/usuarios/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalid)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/validation"))
+                .andExpect(jsonPath("$.campos").exists());
+    }
+
+    @Test
+    @DisplayName("PATCH /api/v1/usuarios/{id}/password - deve retornar 400 com nova senha fraca")
+    void shouldReturn400WeakNewPassword() throws Exception {
+        ChangePasswordDTO dto = new ChangePasswordDTO("SenhaAtual123", "fraca");
+
+        mockMvc.perform(patch("/api/v1/usuarios/1/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/validation"))
+                .andExpect(jsonPath("$.campos").exists());
+    }
+
+    @Test
     @DisplayName("POST /api/v1/usuarios - deve retornar 409 ProblemDetail com login duplicado")
     void shouldReturn409DuplicateLogin() throws Exception {
         when(service.create(any())).thenThrow(new LoginAlreadyExistsException("joaosilva"));

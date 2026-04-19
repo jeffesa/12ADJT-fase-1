@@ -113,6 +113,14 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Deve retornar lista vazia quando não há usuários")
+    void shouldReturnEmptyListWhenNoUsers() {
+        when(repository.findAll()).thenReturn(List.of());
+
+        assertTrue(service.findAll().isEmpty());
+    }
+
+    @Test
     @DisplayName("Deve buscar usuário por ID com sucesso")
     void shouldFindById() {
         when(repository.findById(1L)).thenReturn(Optional.of(user));
@@ -183,6 +191,17 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Deve atualizar sem conflito ao manter o próprio email e login")
+    void shouldUpdateWithSameEmailAndLoginNoConflict() {
+        when(repository.findById(1L)).thenReturn(Optional.of(user));
+        when(repository.findByEmail(updateDTO.email())).thenReturn(Optional.of(user));
+        when(repository.findByLogin(updateDTO.login())).thenReturn(Optional.of(user));
+        when(repository.save(any(User.class))).thenReturn(user);
+
+        assertDoesNotThrow(() -> service.update(1L, updateDTO));
+    }
+
+    @Test
     @DisplayName("Deve lançar exceção ao atualizar usuário inexistente")
     void shouldThrowExceptionUpdateNonExistent() {
         when(repository.findById(99L)).thenReturn(Optional.empty());
@@ -246,7 +265,7 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Deve trocar senha com sucesso")
+    @DisplayName("Deve trocar senha com sucesso e salvar novo hash")
     void shouldChangePassword() {
         ChangePasswordDTO dto = new ChangePasswordDTO("senha123", "novaSenha456");
 
@@ -257,7 +276,8 @@ class UserServiceTest {
 
         service.changePassword(1L, dto);
 
-        verify(repository).save(any(User.class));
+        assertEquals("nova_senha_hash", user.getPassword());
+        verify(repository).save(user);
     }
 
     @Test
