@@ -1,106 +1,125 @@
 {
   "info": {
     "name": "FIAP Fase 1 - Usuarios",
+    "description": "Coleção de requisições para a API de Gerenciamento de Usuários - Tech Challenge FIAP Fase 1",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:8080"
+      "value": "http://localhost:8080",
+      "description": "URL base da aplicação"
+    },
+    {
+      "key": "userId",
+      "value": "1",
+      "description": "ID do usuário para operações por ID"
     }
   ],
   "item": [
     {
-      "name": "Criar Usuario",
-      "request": {
-        "method": "POST",
-        "url": "{{baseUrl}}/api/v1/usuarios",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
+      "name": "Usuários",
+      "item": [
+        {
+          "name": "Criar Usuário (CUSTOMER)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/usuarios",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"João Silva\",\n  \"email\": \"joao.silva@email.com\",\n  \"login\": \"joaosilva\",\n  \"password\": \"Senha123\",\n  \"address\": \"Rua das Flores, 123 - São Paulo/SP\",\n  \"type\": \"CUSTOMER\"\n}"
+            }
           }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"name\": \"João Silva\",\n  \"email\": \"joao@email.com\",\n  \"login\": \"joaosilva\",\n  \"password\": \"senha123\"\n}"
-        }
-      }
-    },
-    {
-      "name": "Listar Usuarios",
-      "request": {
-        "method": "GET",
-        "url": "{{baseUrl}}/api/v1/usuarios",
-        "header": []
-      }
-    },
-    {
-      "name": "Buscar Usuario por ID",
-      "request": {
-        "method": "GET",
-        "url": "{{baseUrl}}/api/v1/usuarios/1",
-        "header": []
-      }
-    },
-    {
-      "name": "Atualizar Usuario",
-      "request": {
-        "method": "PUT",
-        "url": "{{baseUrl}}/api/v1/usuarios/1",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
+        },
+        {
+          "name": "Criar Usuário (RESTAURANT_OWNER)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/usuarios",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Maria Oliveira\",\n  \"email\": \"maria.oliveira@restaurante.com\",\n  \"login\": \"mariaoliveira\",\n  \"password\": \"Restaurante1\",\n  \"address\": \"Av. Paulista, 1000 - São Paulo/SP\",\n  \"type\": \"RESTAURANT_OWNER\"\n}"
+            }
           }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"name\": \"João Atualizado\",\n  \"email\": \"joao@email.com\",\n  \"login\": \"joaosilva\",\n  \"password\": \"novaSenha123\"\n}"
-        }
-      }
-    },
-    {
-      "name": "Deletar Usuario",
-      "request": {
-        "method": "DELETE",
-        "url": "{{baseUrl}}/api/v1/usuarios/1",
-        "header": []
-      }
-    },
-    {
-      "name": "Login",
-      "request": {
-        "method": "POST",
-        "url": "{{baseUrl}}/api/v1/usuarios/login",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
+        },
+        {
+          "name": "Listar Usuários",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/usuarios",
+            "header": []
           }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"login\": \"joaosilva\",\n  \"password\": \"senha123\"\n}"
+        },
+        {
+          "name": "Buscar Usuário por ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/usuarios/{{userId}}",
+            "header": []
+          }
+        },
+        {
+          "name": "Atualizar Usuário",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/v1/usuarios/{{userId}}",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"João Silva Atualizado\",\n  \"email\": \"joao.novo@email.com\",\n  \"login\": \"joaosilva\",\n  \"address\": \"Av. Paulista, 1000 - São Paulo/SP\",\n  \"type\": \"RESTAURANT_OWNER\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Deletar Usuário",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/usuarios/{{userId}}",
+            "header": []
+          }
         }
-      }
+      ]
     },
     {
-      "name": "Login - Credenciais Inválidas",
-      "request": {
-        "method": "POST",
-        "url": "{{baseUrl}}/api/v1/usuarios/login",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
+      "name": "Autenticação",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/usuarios/login",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"joaosilva\",\n  \"password\": \"Senha123\"\n}"
+            }
           }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"login\": \"joaosilva\",\n  \"password\": \"senhaErrada\"\n}"
+        },
+        {
+          "name": "Trocar Senha",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/usuarios/{{userId}}/password",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"SenhaAtual123\",\n  \"newPassword\": \"NovaSenha456\"\n}"
+            }
+          }
         }
-      }
+      ]
     }
   ]
 }
