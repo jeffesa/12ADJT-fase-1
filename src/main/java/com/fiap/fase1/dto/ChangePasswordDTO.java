@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 @Schema(description = "Dados para troca de senha do usuário")
 public record ChangePasswordDTO(
         @NotBlank(message = "A senha atual é obrigatória")
-        @Schema(description = "Senha atual do usuário", example = "senha123")
+        @Schema(description = "Senha atual do usuário", example = "SenhaAtual123")
         String currentPassword,
 
         @NotBlank(message = "A nova senha é obrigatória")

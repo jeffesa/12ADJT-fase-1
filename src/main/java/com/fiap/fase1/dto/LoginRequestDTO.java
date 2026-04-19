@@ -10,6 +10,6 @@ public record LoginRequestDTO(
     String login,
 
     @NotBlank(message = "A senha é obrigatória")
-    @Schema(description = "Senha do usuário", example = "senha123")
+    @Schema(description = "Senha do usuário", example = "Senha123")
     String password
 ) {}

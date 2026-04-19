@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import com.fiap.fase1.model.UserType;
 
-@Schema(description = "Dados para criação ou atualização de usuário")
+@Schema(description = "Dados para criação de usuário")
 public record UserRequestDTO(
         @NotBlank(message = "O nome é obrigatório")
         @Size(min = 2, max = 100, message = "O nome deve ter entre 2 e 100 caracteres")
