@@ -58,7 +58,7 @@ class UserModelTest {
     @Test
     @DisplayName("Deve retornar false ao comparar com objeto de outra classe")
     void equalsDifferentClass() {
-        assertNotEquals(user, "string");
+        assertNotEquals("string", user);
     }
 
     @Test
