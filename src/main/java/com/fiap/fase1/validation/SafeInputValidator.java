@@ -5,7 +5,6 @@ import jakarta.validation.ConstraintValidatorContext;
 
 public class SafeInputValidator implements ConstraintValidator<SafeInput, String> {
 
-    // Rejects HTML tags and null bytes
     private static final String DANGEROUS_PATTERN = ".*[<>\"'`\u0000].*";
 
     @Override

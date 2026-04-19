@@ -77,17 +77,4 @@ class UserRepositoryTest {
         assertFalse(repository.existsByLogin("naoexiste"));
     }
 
-    @Test
-    @DisplayName("Deve encontrar usuário por login e senha")
-    void shouldFindByLoginAndPassword() {
-        Optional<User> result = repository.findByLoginAndPassword("joaosilva", "senha_hash");
-        assertTrue(result.isPresent());
-        assertEquals("joaosilva", result.get().getLogin());
-    }
-
-    @Test
-    @DisplayName("Deve retornar vazio ao buscar login e senha incorretos")
-    void shouldReturnEmptyWrongLoginAndPassword() {
-        assertTrue(repository.findByLoginAndPassword("joaosilva", "senha_errada").isEmpty());
-    }
 }
