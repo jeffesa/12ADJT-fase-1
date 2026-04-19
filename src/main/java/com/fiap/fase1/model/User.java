@@ -33,7 +33,7 @@ public class User {
     private String login;
 
     @NotBlank
-    @Size(min = 6)
+    @Size(min = 8)
     @Column(nullable = false)
     private String password;
 
