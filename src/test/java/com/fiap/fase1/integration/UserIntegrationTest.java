@@ -1,7 +1,6 @@
 package com.fiap.fase1.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fiap.fase1.model.UserType;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -32,7 +31,7 @@ class UserIntegrationTest {
 
     private static final String BASE_URL = "/api/v1/usuarios";
 
-    private Map<String, Object> usuarioValido() {
+    private Map<String, Object> joao() {
         return Map.of(
                 "name", "João Silva",
                 "email", "joao.silva@email.com",
@@ -43,17 +42,55 @@ class UserIntegrationTest {
         );
     }
 
+    private Map<String, Object> maria() {
+        return Map.of(
+                "name", "Maria Oliveira",
+                "email", "maria.oliveira@email.com",
+                "login", "mariaoliveira",
+                "password", "Maria123",
+                "address", "Av. Paulista, 1000 - São Paulo/SP",
+                "type", "RESTAURANT_OWNER"
+        );
+    }
+
+    // =========================================================
+    // HEALTH CHECK
+    // =========================================================
+
+    @Test
+    @Order(0)
+    @DisplayName("HEALTH - Deve retornar status UP no actuator/health")
+    void deveRetornarHealthUp() throws Exception {
+        mockMvc.perform(get("/actuator/health"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"))
+                .andExpect(jsonPath("$.components.db.status").value("UP"));
+    }
+
+    // =========================================================
+    // ESTADO INICIAL
+    // =========================================================
+
+    @Test
+    @Order(1)
+    @DisplayName("LISTA VAZIA - Deve retornar lista vazia antes de qualquer criação")
+    void deveRetornarListaVazia() throws Exception {
+        mockMvc.perform(get(BASE_URL))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
+
     // =========================================================
     // CRUD COMPLETO
     // =========================================================
 
     @Test
-    @Order(1)
+    @Order(2)
     @DisplayName("CRUD 1 - Deve criar usuário com sucesso e retornar 201")
     void deveCriarUsuario() throws Exception {
         mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(usuarioValido())))
+                        .content(objectMapper.writeValueAsString(joao())))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
                 .andExpect(jsonPath("$.id").value(1))
@@ -65,7 +102,7 @@ class UserIntegrationTest {
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     @DisplayName("CRUD 2 - Deve listar usuários e retornar o usuário criado")
     void deveListarUsuarios() throws Exception {
         mockMvc.perform(get(BASE_URL))
@@ -75,7 +112,7 @@ class UserIntegrationTest {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     @DisplayName("CRUD 3 - Deve buscar usuário por ID com sucesso")
     void deveBuscarUsuarioPorId() throws Exception {
         mockMvc.perform(get(BASE_URL + "/1"))
@@ -85,7 +122,7 @@ class UserIntegrationTest {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     @DisplayName("CRUD 4 - Deve atualizar usuário com sucesso")
     void deveAtualizarUsuario() throws Exception {
         Map<String, Object> update = Map.of(
@@ -106,16 +143,27 @@ class UserIntegrationTest {
     }
 
     @Test
-    @Order(5)
-    @DisplayName("CRUD 5 - Deve deletar usuário e retornar 204")
+    @Order(6)
+    @DisplayName("CRUD 5 - Deve persistir dados após atualização (GET após PUT)")
+    void devePersistirDadosAposAtualizacao() throws Exception {
+        mockMvc.perform(get(BASE_URL + "/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("João Silva Atualizado"))
+                .andExpect(jsonPath("$.type").value("RESTAURANT_OWNER"))
+                .andExpect(jsonPath("$.address").value("Av. Paulista, 1000 - São Paulo/SP"));
+    }
+
+    @Test
+    @Order(7)
+    @DisplayName("CRUD 6 - Deve deletar usuário e retornar 204")
     void deveDeletarUsuario() throws Exception {
         mockMvc.perform(delete(BASE_URL + "/1"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    @Order(6)
-    @DisplayName("CRUD 6 - Deve confirmar que usuário deletado não existe mais")
+    @Order(8)
+    @DisplayName("CRUD 7 - Deve confirmar que usuário deletado não existe mais")
     void deveConfirmarDelecao() throws Exception {
         mockMvc.perform(get(BASE_URL + "/1"))
                 .andExpect(status().isNotFound())
@@ -132,7 +180,7 @@ class UserIntegrationTest {
     void deveCriarUsuarioParaLogin() throws Exception {
         mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(usuarioValido())))
+                        .content(objectMapper.writeValueAsString(joao())))
                 .andExpect(status().isCreated());
     }
 
@@ -177,6 +225,19 @@ class UserIntegrationTest {
                         .content(objectMapper.writeValueAsString(login)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.status").value(401));
+    }
+
+    @Test
+    @Order(14)
+    @DisplayName("LOGIN 5 - Deve retornar 400 com campos de login em branco")
+    void deveRetornar400CamposLoginEmBranco() throws Exception {
+        Map<String, String> login = Map.of("login", "", "password", "");
+
+        mockMvc.perform(post(BASE_URL + "/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(login)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.campos").exists());
     }
 
     // =========================================================
@@ -226,6 +287,22 @@ class UserIntegrationTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    @Order(23)
+    @DisplayName("SENHA 4 - Deve retornar 404 ao trocar senha de ID inexistente")
+    void deveRetornar404TrocarSenhaIdInexistente() throws Exception {
+        Map<String, String> dto = Map.of(
+                "currentPassword", "Senha123",
+                "newPassword", "NovaSenha456"
+        );
+
+        mockMvc.perform(patch(BASE_URL + "/9999/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
     }
 
     // =========================================================
@@ -292,6 +369,17 @@ class UserIntegrationTest {
                 .andExpect(jsonPath("$.campos.email").exists());
     }
 
+    @Test
+    @Order(33)
+    @DisplayName("VALIDAÇÃO 4 - Deve retornar 400 para body vazio")
+    void deveRetornar400BodyVazio() throws Exception {
+        mockMvc.perform(post(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.campos").exists());
+    }
+
     // =========================================================
     // UNICIDADE E CONFLITOS
     // =========================================================
@@ -302,7 +390,7 @@ class UserIntegrationTest {
     void deveRetornar409EmailDuplicado() throws Exception {
         mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(usuarioValido())))
+                        .content(objectMapper.writeValueAsString(joao())))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/conflict"))
                 .andExpect(jsonPath("$.status").value(409));
@@ -324,6 +412,53 @@ class UserIntegrationTest {
         mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409));
+    }
+
+    @Test
+    @Order(42)
+    @DisplayName("CONFLITO 3 - Setup: cria segundo usuário para teste de conflito no PUT")
+    void deveCriarSegundoUsuario() throws Exception {
+        mockMvc.perform(post(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(maria())))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @Order(43)
+    @DisplayName("CONFLITO 4 - Deve retornar 409 ao atualizar com email de outro usuário")
+    void deveRetornar409AtualizarComEmailDeOutroUsuario() throws Exception {
+        Map<String, Object> update = Map.of(
+                "name", "Maria Oliveira",
+                "email", "joao.silva@email.com",
+                "login", "mariaoliveira",
+                "address", "Av. Paulista, 1000 - São Paulo/SP",
+                "type", "RESTAURANT_OWNER"
+        );
+
+        mockMvc.perform(put(BASE_URL + "/3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(update)))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @Order(44)
+    @DisplayName("CONFLITO 5 - Deve retornar 409 ao atualizar com login de outro usuário")
+    void deveRetornar409AtualizarComLoginDeOutroUsuario() throws Exception {
+        Map<String, Object> update = Map.of(
+                "name", "Maria Oliveira",
+                "email", "maria.oliveira@email.com",
+                "login", "joaosilva",
+                "address", "Av. Paulista, 1000 - São Paulo/SP",
+                "type", "RESTAURANT_OWNER"
+        );
+
+        mockMvc.perform(put(BASE_URL + "/3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.status").value(409));
     }
