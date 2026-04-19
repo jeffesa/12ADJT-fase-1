@@ -185,9 +185,46 @@ public class UserController {
         )
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Senha alterada com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Senha atual incorreta ou nova senha não atende aos requisitos"),
-        @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+        @ApiResponse(
+            responseCode = "200",
+            description = "Senha alterada com sucesso",
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                examples = @ExampleObject(value = "{\"mensagem\": \"Senha alterada com sucesso\"}")
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Senha atual incorreta ou nova senha não atende aos requisitos",
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                examples = @ExampleObject(value = """
+                    {
+                      "type": "https://api.fiap.com/errors/bad-request",
+                      "title": "Requisição inválida",
+                      "status": 400,
+                      "detail": "Senha atual incorreta",
+                      "instance": "/api/v1/usuarios/1/password"
+                    }
+                    """)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Usuário não encontrado",
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                examples = @ExampleObject(value = """
+                    {
+                      "type": "https://api.fiap.com/errors/not-found",
+                      "title": "Usuário não encontrado",
+                      "status": 404,
+                      "detail": "Usuário não encontrado com id: 1",
+                      "instance": "/api/v1/usuarios/1/password"
+                    }
+                    """)
+            )
+        )
     })
     @PatchMapping("/{id}/password")
     public ResponseEntity<Map<String, String>> changePassword(
