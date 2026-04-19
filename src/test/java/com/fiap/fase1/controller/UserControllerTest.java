@@ -12,6 +12,7 @@ import com.fiap.fase1.exception.InvalidCredentialsException;
 import com.fiap.fase1.exception.EmailAlreadyExistsException;
 import com.fiap.fase1.exception.LoginAlreadyExistsException;
 import com.fiap.fase1.exception.UserNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import com.fiap.fase1.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -257,6 +258,34 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/not-found"))
                 .andExpect(jsonPath("$.title").value("Usuário não encontrado"))
                 .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/usuarios - deve retornar 409 em violação de integridade no banco")
+    void shouldReturn409DataIntegrityViolation() throws Exception {
+        when(service.create(any())).thenThrow(new DataIntegrityViolationException("unique constraint"));
+
+        mockMvc.perform(post("/api/v1/usuarios")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/conflict"))
+                .andExpect(jsonPath("$.title").value("Conflito de dados"))
+                .andExpect(jsonPath("$.status").value(409));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/usuarios/login - deve retornar 401 com mensagem customizada")
+    void shouldReturn401WithCustomMessage() throws Exception {
+        LoginRequestDTO loginDTO = new LoginRequestDTO("joaosilva", "senhaErrada");
+
+        when(service.login(any())).thenThrow(new InvalidCredentialsException("Usuário bloqueado"));
+
+        mockMvc.perform(post("/api/v1/usuarios/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginDTO)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.detail").value("Usuário bloqueado"));
     }
 
     @Test
