@@ -3,6 +3,7 @@ package com.fiap.fase1.controller;
 import com.fiap.fase1.dto.ChangePasswordDTO;
 import com.fiap.fase1.dto.LoginRequestDTO;
 import com.fiap.fase1.dto.LoginResponseDTO;
+import com.fiap.fase1.dto.MessageResponseDTO;
 import com.fiap.fase1.dto.UserRequestDTO;
 import com.fiap.fase1.dto.UserResponseDTO;
 import com.fiap.fase1.dto.UserUpdateDTO;
@@ -24,7 +25,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/usuarios")
@@ -185,14 +185,7 @@ public class UserController {
         )
     )
     @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            description = "Senha alterada com sucesso",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                examples = @ExampleObject(value = "{\"mensagem\": \"Senha alterada com sucesso\"}")
-            )
-        ),
+        @ApiResponse(responseCode = "200", description = "Senha alterada com sucesso"),
         @ApiResponse(
             responseCode = "400",
             description = "Senha atual incorreta ou nova senha não atende aos requisitos",
@@ -227,12 +220,12 @@ public class UserController {
         )
     })
     @PatchMapping("/{id}/password")
-    public ResponseEntity<Map<String, String>> changePassword(
+    public ResponseEntity<MessageResponseDTO> changePassword(
             @Parameter(description = "ID do usuário", example = "1", required = true)
             @PathVariable Long id,
             @Valid @org.springframework.web.bind.annotation.RequestBody ChangePasswordDTO dto) {
         service.changePassword(id, dto);
-        return ResponseEntity.ok(Map.of("mensagem", "Senha alterada com sucesso"));
+        return ResponseEntity.ok(new MessageResponseDTO("Senha alterada com sucesso"));
     }
 
     @Operation(
