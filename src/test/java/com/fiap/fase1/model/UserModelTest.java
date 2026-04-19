@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -71,6 +72,22 @@ class UserModelTest {
     @DisplayName("hashCode deve ser diferente para usuários com IDs diferentes")
     void hashCodeDifferentId() {
         assertNotEquals(user.hashCode(), differentUser.hashCode());
+    }
+
+    @Test
+    @DisplayName("Construtor padrão deve criar instância não nula")
+    void defaultConstructorCreatesInstance() {
+        assertNotNull(new User());
+    }
+
+    @Test
+    @DisplayName("updateLastModifiedDate deve definir timestamp ao persistir")
+    void updateLastModifiedDateSetsTimestamp() throws Exception {
+        User newUser = new User();
+        Method method = User.class.getDeclaredMethod("updateLastModifiedDate");
+        method.setAccessible(true);
+        method.invoke(newUser);
+        assertNotNull(newUser.getLastModifiedDate());
     }
 
     @Test
