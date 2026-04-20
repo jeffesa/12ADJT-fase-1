@@ -110,10 +110,11 @@ public class UserService {
         log.info("Tentativa de login para o usuário: {}", dto.login());
 
         User user = repository.findByLogin(dto.login())
-                .orElseThrow(() -> {
-                    log.warn("Tentativa de login falhou - usuário não encontrado: {}", dto.login());
-                    return new InvalidCredentialsException();
-                });
+                .orElse(null);
+        if (user == null) {
+            log.warn("Tentativa de login falhou - usuário não encontrado: {}", dto.login());
+            throw new InvalidCredentialsException();
+        }
 
         if (!passwordEncoder.matches(dto.password(), user.getPassword())) {
             log.warn("Tentativa de login falhou - senha incorreta para o usuário: {}", dto.login());

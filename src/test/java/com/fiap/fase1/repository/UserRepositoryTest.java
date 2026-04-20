@@ -78,16 +78,35 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("Deve encontrar usuário por login e senha")
-    void shouldFindByLoginAndPassword() {
-        Optional<User> result = repository.findByLoginAndPassword("joaosilva", "senha_hash");
-        assertTrue(result.isPresent());
-        assertEquals("joaosilva", result.get().getLogin());
+    @DisplayName("findAll deve retornar todos os usuários salvos")
+    void shouldFindAllSavedUsers() {
+        repository.save(new User("Maria", "maria@email.com", "maria", "senha_hash", "Rua B, 456", UserType.RESTAURANT_OWNER));
+
+        assertEquals(2, repository.findAll().size());
     }
 
     @Test
-    @DisplayName("Deve retornar vazio ao buscar login e senha incorretos")
-    void shouldReturnEmptyWrongLoginAndPassword() {
-        assertTrue(repository.findByLoginAndPassword("joaosilva", "senha_errada").isEmpty());
+    @DisplayName("deleteById deve remover o usuário")
+    void shouldDeleteById() {
+        Long id = repository.findByLogin("joaosilva").get().getId();
+
+        repository.deleteById(id);
+
+        assertFalse(repository.existsById(id));
     }
+
+    @Test
+    @DisplayName("existsById deve retornar true para usuário existente")
+    void shouldReturnTrueExistingId() {
+        Long id = repository.findByLogin("joaosilva").get().getId();
+
+        assertTrue(repository.existsById(id));
+    }
+
+    @Test
+    @DisplayName("existsById deve retornar false para ID inexistente")
+    void shouldReturnFalseNonExistingId() {
+        assertFalse(repository.existsById(9999L));
+    }
+
 }

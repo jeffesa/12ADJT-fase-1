@@ -13,74 +13,51 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    private static final URI TYPE_NOT_FOUND = URI.create("https://api.fiap.com/errors/not-found");
-    private static final URI TYPE_CONFLICT = URI.create("https://api.fiap.com/errors/conflict");
+    private static final URI TYPE_NOT_FOUND    = URI.create("https://api.fiap.com/errors/not-found");
+    private static final URI TYPE_CONFLICT     = URI.create("https://api.fiap.com/errors/conflict");
     private static final URI TYPE_UNAUTHORIZED = URI.create("https://api.fiap.com/errors/unauthorized");
-    private static final URI TYPE_VALIDATION = URI.create("https://api.fiap.com/errors/validation");
-    private static final URI TYPE_BAD_REQUEST = URI.create("https://api.fiap.com/errors/bad-request");
+    private static final URI TYPE_VALIDATION   = URI.create("https://api.fiap.com/errors/validation");
+    private static final URI TYPE_BAD_REQUEST  = URI.create("https://api.fiap.com/errors/bad-request");
 
     @ExceptionHandler(UserNotFoundException.class)
     public ProblemDetail handleUserNotFound(UserNotFoundException ex, HttpServletRequest request) {
         log.warn("Usuário não encontrado: {} | Path: {}", ex.getMessage(), request.getRequestURI());
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
-        problem.setTitle("Usuário não encontrado");
-        problem.setType(TYPE_NOT_FOUND);
-        problem.setInstance(URI.create(request.getRequestURI()));
-        return problem;
+        return buildProblem(HttpStatus.NOT_FOUND, ex.getMessage(), "Usuário não encontrado", TYPE_NOT_FOUND, request);
     }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ProblemDetail handleEmailAlreadyExists(EmailAlreadyExistsException ex, HttpServletRequest request) {
         log.warn("Email duplicado: {} | Path: {}", ex.getMessage(), request.getRequestURI());
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
-        problem.setTitle("Email já cadastrado");
-        problem.setType(TYPE_CONFLICT);
-        problem.setInstance(URI.create(request.getRequestURI()));
-        return problem;
+        return buildProblem(HttpStatus.CONFLICT, ex.getMessage(), "Email já cadastrado", TYPE_CONFLICT, request);
     }
 
     @ExceptionHandler(LoginAlreadyExistsException.class)
     public ProblemDetail handleLoginAlreadyExists(LoginAlreadyExistsException ex, HttpServletRequest request) {
         log.warn("Login duplicado: {} | Path: {}", ex.getMessage(), request.getRequestURI());
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
-        problem.setTitle("Login já cadastrado");
-        problem.setType(TYPE_CONFLICT);
-        problem.setInstance(URI.create(request.getRequestURI()));
-        return problem;
+        return buildProblem(HttpStatus.CONFLICT, ex.getMessage(), "Login já cadastrado", TYPE_CONFLICT, request);
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
     public ProblemDetail handleInvalidCredentials(InvalidCredentialsException ex, HttpServletRequest request) {
         log.warn("Credenciais inválidas | Path: {}", request.getRequestURI());
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
-        problem.setTitle("Credenciais inválidas");
-        problem.setType(TYPE_UNAUTHORIZED);
-        problem.setInstance(URI.create(request.getRequestURI()));
-        return problem;
+        return buildProblem(HttpStatus.UNAUTHORIZED, ex.getMessage(), "Credenciais inválidas", TYPE_UNAUTHORIZED, request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
-        String errors = ex.getBindingResult().getFieldErrors().stream()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .collect(Collectors.joining("; "));
-        log.warn("Validação falhou: {} | Path: {}", errors, request.getRequestURI());
-
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Erro de validação");
-        problem.setTitle("Dados inválidos");
-        problem.setType(TYPE_VALIDATION);
-        problem.setInstance(URI.create(request.getRequestURI()));
-
         Map<String, String> fieldErrors = new LinkedHashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 fieldErrors.put(error.getField(), error.getDefaultMessage()));
+
+        log.warn("Validação falhou: {} | Path: {}", fieldErrors, request.getRequestURI());
+
+        ProblemDetail problem = buildProblem(HttpStatus.BAD_REQUEST, "Erro de validação", "Dados inválidos", TYPE_VALIDATION, request);
         problem.setProperty("campos", fieldErrors);
         return problem;
     }
@@ -88,19 +65,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ProblemDetail handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest request) {
         log.error("Violação de integridade de dados: {} | Path: {}", ex.getMostSpecificCause().getMessage(), request.getRequestURI());
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "Violação de integridade de dados");
-        problem.setTitle("Conflito de dados");
-        problem.setType(TYPE_CONFLICT);
-        problem.setInstance(URI.create(request.getRequestURI()));
-        return problem;
+        return buildProblem(HttpStatus.CONFLICT, "Violação de integridade de dados", "Conflito de dados", TYPE_CONFLICT, request);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ProblemDetail handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest request) {
         log.warn("Argumento inválido: {} | Path: {}", ex.getMessage(), request.getRequestURI());
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
-        problem.setTitle("Requisição inválida");
-        problem.setType(TYPE_BAD_REQUEST);
+        return buildProblem(HttpStatus.BAD_REQUEST, ex.getMessage(), "Requisição inválida", TYPE_BAD_REQUEST, request);
+    }
+
+    private ProblemDetail buildProblem(HttpStatus status, String detail, String title, URI type, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(status, detail);
+        problem.setTitle(title);
+        problem.setType(type);
         problem.setInstance(URI.create(request.getRequestURI()));
         return problem;
     }

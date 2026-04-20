@@ -12,6 +12,7 @@ import com.fiap.fase1.exception.InvalidCredentialsException;
 import com.fiap.fase1.exception.EmailAlreadyExistsException;
 import com.fiap.fase1.exception.LoginAlreadyExistsException;
 import com.fiap.fase1.exception.UserNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import com.fiap.fase1.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -57,7 +58,7 @@ class UserControllerTest {
     @BeforeEach
     void setUp() {
         responseDTO = new UserResponseDTO(1L, "João Silva", "joao@email.com", "joaosilva", "Rua A, 123", UserType.CUSTOMER, LocalDateTime.now());
-        requestDTO = new UserRequestDTO("João Silva", "joao@email.com", "joaosilva", "senha123", "Rua A, 123", UserType.CUSTOMER);
+        requestDTO = new UserRequestDTO("João Silva", "joao@email.com", "joaosilva", "Senha123", "Rua A, 123", UserType.CUSTOMER);
         updateDTO = new UserUpdateDTO("João Silva", "joao@email.com", "joaosilva", "Rua A, 123", UserType.CUSTOMER);
         loginResponseDTO = new LoginResponseDTO("Login realizado com sucesso", 1L, "joaosilva", "joao@email.com", LocalDateTime.now());
     }
@@ -257,6 +258,99 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/not-found"))
                 .andExpect(jsonPath("$.title").value("Usuário não encontrado"))
                 .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/usuarios - deve retornar 409 em violação de integridade no banco")
+    void shouldReturn409DataIntegrityViolation() throws Exception {
+        when(service.create(any())).thenThrow(new DataIntegrityViolationException("unique constraint"));
+
+        mockMvc.perform(post("/api/v1/usuarios")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/conflict"))
+                .andExpect(jsonPath("$.title").value("Conflito de dados"))
+                .andExpect(jsonPath("$.status").value(409));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/usuarios/login - deve retornar 401 com mensagem customizada")
+    void shouldReturn401WithCustomMessage() throws Exception {
+        LoginRequestDTO loginDTO = new LoginRequestDTO("joaosilva", "senhaErrada");
+
+        when(service.login(any())).thenThrow(new InvalidCredentialsException("Usuário bloqueado"));
+
+        mockMvc.perform(post("/api/v1/usuarios/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginDTO)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.detail").value("Usuário bloqueado"));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/usuarios - deve retornar lista vazia")
+    void shouldReturnEmptyList() throws Exception {
+        when(service.findAll()).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/v1/usuarios"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    @DisplayName("PUT /api/v1/usuarios/{id} - deve retornar 409 com email de outro usuário")
+    void shouldReturn409UpdateDuplicateEmail() throws Exception {
+        when(service.update(eq(1L), any())).thenThrow(new EmailAlreadyExistsException("joao@email.com"));
+
+        mockMvc.perform(put("/api/v1/usuarios/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDTO)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/conflict"))
+                .andExpect(jsonPath("$.title").value("Email já cadastrado"))
+                .andExpect(jsonPath("$.status").value(409));
+    }
+
+    @Test
+    @DisplayName("PUT /api/v1/usuarios/{id} - deve retornar 409 com login de outro usuário")
+    void shouldReturn409UpdateDuplicateLogin() throws Exception {
+        when(service.update(eq(1L), any())).thenThrow(new LoginAlreadyExistsException("joaosilva"));
+
+        mockMvc.perform(put("/api/v1/usuarios/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDTO)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/conflict"))
+                .andExpect(jsonPath("$.title").value("Login já cadastrado"))
+                .andExpect(jsonPath("$.status").value(409));
+    }
+
+    @Test
+    @DisplayName("PUT /api/v1/usuarios/{id} - deve retornar 400 com dados inválidos")
+    void shouldReturn400UpdateInvalidData() throws Exception {
+        UserUpdateDTO invalid = new UserUpdateDTO("", "email-invalido", "login", "Rua A", UserType.CUSTOMER);
+
+        mockMvc.perform(put("/api/v1/usuarios/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalid)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/validation"))
+                .andExpect(jsonPath("$.campos").exists());
+    }
+
+    @Test
+    @DisplayName("PATCH /api/v1/usuarios/{id}/password - deve retornar 400 com nova senha fraca")
+    void shouldReturn400WeakNewPassword() throws Exception {
+        ChangePasswordDTO dto = new ChangePasswordDTO("SenhaAtual123", "fraca");
+
+        mockMvc.perform(patch("/api/v1/usuarios/1/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/validation"))
+                .andExpect(jsonPath("$.campos").exists());
     }
 
     @Test
