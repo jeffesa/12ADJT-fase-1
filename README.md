@@ -53,6 +53,67 @@ src/
 
 ---
 
+## 🏗️ Arquitetura
+
+### Diagrama de Camadas
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    CLIENT (HTTP)                     │
+└─────────────────────┬───────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────┐
+│              Controller (REST API)                   │
+│         Recebe requisições, valida entrada           │
+└─────────────────────┬───────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────┐
+│                Service (Negócio)                     │
+│     Regras de negócio, validações, orquestração     │
+└─────────────────────┬───────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────┐
+│              Repository (Dados)                      │
+│         Acesso ao banco via Spring Data JPA         │
+└─────────────────────┬───────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────┐
+│              PostgreSQL / H2 (Banco)                 │
+└─────────────────────────────────────────────────────┘
+```
+
+### Justificativa das Escolhas Técnicas
+
+| Tecnologia | Justificativa |
+|---|---|
+| **Java 17** | LTS estável, suporte a records, text blocks e pattern matching |
+| **Spring Boot 3.2** | Framework maduro, produtivo, com ecossistema completo (Web, Data, Security) |
+| **PostgreSQL** | Banco relacional robusto, gratuito, suporte a tipos avançados |
+| **H2 (testes)** | Banco em memória para testes rápidos sem dependência externa |
+| **Docker Compose** | Orquestração local simplificada (app + banco com um comando) |
+| **BCrypt** | Algoritmo de hash adaptativo, padrão da indústria para senhas |
+| **ProblemDetail (RFC 7807)** | Padrão HTTP para respostas de erro, nativo do Spring 6 |
+| **Swagger/OpenAPI** | Documentação interativa da API, gerada automaticamente |
+
+### Padrões de Projeto Utilizados
+
+- **DTO Pattern** — separação entre camada de apresentação e domínio (records imutáveis)
+- **Repository Pattern** — abstração de acesso a dados via Spring Data JPA
+- **Service Layer** — centralização da lógica de negócio
+- **Global Exception Handler** — tratamento centralizado de erros com `@RestControllerAdvice`
+- **Builder Pattern** — uso de `ProblemDetail.forStatusAndDetail()` para construção de respostas de erro
+- **Strategy Pattern (profiles)** — configurações diferentes por ambiente (dev, prod, test)
+
+### Arquitetura por Ambiente
+
+| Ambiente | Banco | Perfil | Execução |
+|---|---|---|---|
+| **Desenvolvimento** | PostgreSQL (Docker) | `dev` | `docker-compose up` |
+| **Testes** | H2 em memória | `test` | `mvn test` |
+| **Produção** | PostgreSQL (Render.com) | `prod` | Deploy automático via Dockerfile |
+
+---
+
 ## 🚀 Instalação e Configuração
 
 ### Pré-requisitos
