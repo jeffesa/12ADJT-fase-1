@@ -667,3 +667,5 @@ Este projeto foi desenvolvido para fins educacionais - FIAP Tech Challenge.
 ---
 
 **Desenvolvido com ❤️ para o Tech Challenge FIAP**
+
+<!-- Última atualização: 2026-04-23 -->
