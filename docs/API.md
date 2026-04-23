@@ -1,7 +1,10 @@
 # Documentação da API de Gerenciamento de Usuários
 
-Base URL: `http://localhost:8080`  
+Base URL Local: `http://localhost:8080`  
+Base URL Produção: `https://one2adjt-fase-1.onrender.com`  
 Documentação interativa (Swagger): `http://localhost:8080/swagger-ui.html`
+
+> ⚠️ **Observação:** O primeiro acesso ao ambiente de produção (Render.com) pode demorar 50 segundos ou mais, pois a instância gratuita entra em modo de espera após inatividade. Após o primeiro request, a velocidade é normal.
 
 ---
 

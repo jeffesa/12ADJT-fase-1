@@ -618,8 +618,10 @@ O projeto utiliza GitHub Actions para:
 A aplicação está deployada em:
 
 ```
-https://fase-1-spring-explorer.onrender.com
+https://one2adjt-fase-1.onrender.com
 ```
+
+> ⚠️ **Observação:** O primeiro acesso após inatividade pode demorar 50 segundos ou mais, pois a instância gratuita do Render entra em modo de espera. Após o primeiro request, a velocidade é normal.
 
 ---
 
