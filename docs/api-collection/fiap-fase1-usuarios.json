@@ -1,123 +1,237 @@
 {
   "info": {
-    "name": "FIAP Fase 1 - Usuarios",
-    "description": "Coleção de requisições para a API de Gerenciamento de Usuários - Tech Challenge FIAP Fase 1",
+    "name": "FIAP Fase 1 - Gerenciamento de Usuários",
+    "description": "Coleção de requisições para a API de Gerenciamento de Usuários - Tech Challenge FIAP Fase 1.\n\nAmbientes:\n- Local: http://localhost:8080\n- Produção: https://one2adjt-fase-1.onrender.com",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
-      "key": "baseUrl",
-      "value": "http://localhost:8080",
-      "description": "URL base da aplicação"
+      "key": "localUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "prodUrl",
+      "value": "https://one2adjt-fase-1.onrender.com"
     },
     {
       "key": "userId",
-      "value": "1",
-      "description": "ID do usuário para operações por ID"
+      "value": "1"
     }
   ],
   "item": [
     {
-      "name": "Usuários",
+      "name": "local",
       "item": [
         {
-          "name": "Criar Usuário (CUSTOMER)",
-          "request": {
-            "method": "POST",
-            "url": "{{baseUrl}}/api/v1/usuarios",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"João Silva\",\n  \"email\": \"joao.silva@email.com\",\n  \"login\": \"joaosilva\",\n  \"password\": \"Senha123\",\n  \"address\": \"Rua das Flores, 123 - São Paulo/SP\",\n  \"type\": \"CUSTOMER\"\n}"
+          "name": "Usuários",
+          "item": [
+            {
+              "name": "Criar Usuário (CUSTOMER)",
+              "request": {
+                "method": "POST",
+                "url": "{{localUrl}}/api/v1/usuarios",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"João Silva\",\n  \"email\": \"joao.silva@email.com\",\n  \"login\": \"joaosilva\",\n  \"password\": \"Senha123\",\n  \"address\": \"Rua das Flores, 123 - São Paulo/SP\",\n  \"type\": \"CUSTOMER\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Criar Usuário (RESTAURANT_OWNER)",
+              "request": {
+                "method": "POST",
+                "url": "{{localUrl}}/api/v1/usuarios",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Maria Oliveira\",\n  \"email\": \"maria.oliveira@restaurante.com\",\n  \"login\": \"mariaoliveira\",\n  \"password\": \"Restaurante1\",\n  \"address\": \"Av. Paulista, 1000 - São Paulo/SP\",\n  \"type\": \"RESTAURANT_OWNER\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Listar Usuários",
+              "request": {
+                "method": "GET",
+                "url": "{{localUrl}}/api/v1/usuarios"
+              }
+            },
+            {
+              "name": "Buscar Usuário por ID",
+              "request": {
+                "method": "GET",
+                "url": "{{localUrl}}/api/v1/usuarios/{{userId}}"
+              }
+            },
+            {
+              "name": "Atualizar Usuário",
+              "request": {
+                "method": "PUT",
+                "url": "{{localUrl}}/api/v1/usuarios/{{userId}}",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"João Silva Atualizado\",\n  \"email\": \"joao.novo@email.com\",\n  \"login\": \"joaosilva\",\n  \"address\": \"Av. Paulista, 1000 - São Paulo/SP\",\n  \"type\": \"RESTAURANT_OWNER\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Deletar Usuário",
+              "request": {
+                "method": "DELETE",
+                "url": "{{localUrl}}/api/v1/usuarios/{{userId}}"
+              }
             }
-          }
+          ]
         },
         {
-          "name": "Criar Usuário (RESTAURANT_OWNER)",
-          "request": {
-            "method": "POST",
-            "url": "{{baseUrl}}/api/v1/usuarios",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Maria Oliveira\",\n  \"email\": \"maria.oliveira@restaurante.com\",\n  \"login\": \"mariaoliveira\",\n  \"password\": \"Restaurante1\",\n  \"address\": \"Av. Paulista, 1000 - São Paulo/SP\",\n  \"type\": \"RESTAURANT_OWNER\"\n}"
+          "name": "Autenticação",
+          "item": [
+            {
+              "name": "Login",
+              "request": {
+                "method": "POST",
+                "url": "{{localUrl}}/api/v1/usuarios/login",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"login\": \"joaosilva\",\n  \"password\": \"Senha123\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Trocar Senha",
+              "request": {
+                "method": "PATCH",
+                "url": "{{localUrl}}/api/v1/usuarios/{{userId}}/password",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"currentPassword\": \"Senha123\",\n  \"newPassword\": \"NovaSenha456\"\n}"
+                }
+              }
             }
-          }
+          ]
         },
         {
-          "name": "Listar Usuários",
-          "request": {
-            "method": "GET",
-            "url": "{{baseUrl}}/api/v1/usuarios",
-            "header": []
-          }
-        },
-        {
-          "name": "Buscar Usuário por ID",
-          "request": {
-            "method": "GET",
-            "url": "{{baseUrl}}/api/v1/usuarios/{{userId}}",
-            "header": []
-          }
-        },
-        {
-          "name": "Atualizar Usuário",
-          "request": {
-            "method": "PUT",
-            "url": "{{baseUrl}}/api/v1/usuarios/{{userId}}",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"João Silva Atualizado\",\n  \"email\": \"joao.novo@email.com\",\n  \"login\": \"joaosilva\",\n  \"address\": \"Av. Paulista, 1000 - São Paulo/SP\",\n  \"type\": \"RESTAURANT_OWNER\"\n}"
+          "name": "Health Check",
+          "item": [
+            {
+              "name": "Health",
+              "request": {
+                "method": "GET",
+                "url": "{{localUrl}}/actuator/health"
+              }
             }
-          }
-        },
-        {
-          "name": "Deletar Usuário",
-          "request": {
-            "method": "DELETE",
-            "url": "{{baseUrl}}/api/v1/usuarios/{{userId}}",
-            "header": []
-          }
+          ]
         }
       ]
     },
     {
-      "name": "Autenticação",
+      "name": "prod",
       "item": [
         {
-          "name": "Login",
-          "request": {
-            "method": "POST",
-            "url": "{{baseUrl}}/api/v1/usuarios/login",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"login\": \"joaosilva\",\n  \"password\": \"Senha123\"\n}"
+          "name": "Usuários",
+          "item": [
+            {
+              "name": "Criar Usuário (CUSTOMER)",
+              "request": {
+                "method": "POST",
+                "url": "{{prodUrl}}/api/v1/usuarios",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"João Silva\",\n  \"email\": \"joao.silva@email.com\",\n  \"login\": \"joaosilva\",\n  \"password\": \"Senha123\",\n  \"address\": \"Rua das Flores, 123 - São Paulo/SP\",\n  \"type\": \"CUSTOMER\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Criar Usuário (RESTAURANT_OWNER)",
+              "request": {
+                "method": "POST",
+                "url": "{{prodUrl}}/api/v1/usuarios",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Maria Oliveira\",\n  \"email\": \"maria.oliveira@restaurante.com\",\n  \"login\": \"mariaoliveira\",\n  \"password\": \"Restaurante1\",\n  \"address\": \"Av. Paulista, 1000 - São Paulo/SP\",\n  \"type\": \"RESTAURANT_OWNER\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Listar Usuários",
+              "request": {
+                "method": "GET",
+                "url": "{{prodUrl}}/api/v1/usuarios"
+              }
+            },
+            {
+              "name": "Buscar Usuário por ID",
+              "request": {
+                "method": "GET",
+                "url": "{{prodUrl}}/api/v1/usuarios/{{userId}}"
+              }
+            },
+            {
+              "name": "Atualizar Usuário",
+              "request": {
+                "method": "PUT",
+                "url": "{{prodUrl}}/api/v1/usuarios/{{userId}}",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"João Silva Atualizado\",\n  \"email\": \"joao.novo@email.com\",\n  \"login\": \"joaosilva\",\n  \"address\": \"Av. Paulista, 1000 - São Paulo/SP\",\n  \"type\": \"RESTAURANT_OWNER\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Deletar Usuário",
+              "request": {
+                "method": "DELETE",
+                "url": "{{prodUrl}}/api/v1/usuarios/{{userId}}"
+              }
             }
-          }
+          ]
         },
         {
-          "name": "Trocar Senha",
-          "request": {
-            "method": "PATCH",
-            "url": "{{baseUrl}}/api/v1/usuarios/{{userId}}/password",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"currentPassword\": \"SenhaAtual123\",\n  \"newPassword\": \"NovaSenha456\"\n}"
+          "name": "Autenticação",
+          "item": [
+            {
+              "name": "Login",
+              "request": {
+                "method": "POST",
+                "url": "{{prodUrl}}/api/v1/usuarios/login",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"login\": \"joaosilva\",\n  \"password\": \"Senha123\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Trocar Senha",
+              "request": {
+                "method": "PATCH",
+                "url": "{{prodUrl}}/api/v1/usuarios/{{userId}}/password",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"currentPassword\": \"Senha123\",\n  \"newPassword\": \"NovaSenha456\"\n}"
+                }
+              }
             }
-          }
+          ]
+        },
+        {
+          "name": "Health Check",
+          "item": [
+            {
+              "name": "Health",
+              "request": {
+                "method": "GET",
+                "url": "{{prodUrl}}/actuator/health"
+              }
+            }
+          ]
         }
       ]
     }
