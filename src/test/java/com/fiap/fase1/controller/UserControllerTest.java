@@ -1,5 +1,9 @@
 package com.fiap.fase1.controller;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
+import com.fiap.fase1.model.UserType;
+import java.time.LocalDateTime;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.fase1.model.UserType;
 import com.fiap.fase1.dto.ChangePasswordDTO;
@@ -365,5 +369,34 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/conflict"))
                 .andExpect(jsonPath("$.title").value("Login já cadastrado"))
                 .andExpect(jsonPath("$.status").value(409));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/usuarios?name=João - deve buscar usuários por nome e retornar 200")
+    void shouldSearchUsersByNameAndReturn200() throws Exception {
+        UserResponseDTO response = new UserResponseDTO(
+                1L,
+                "João Silva",
+                "joao@email.com",
+                "joaosilva",
+                "Rua Teste, 123",
+                UserType.CUSTOMER,
+                LocalDateTime.now()
+        );
+
+        when(service.findByName("João")).thenReturn(List.of(response));
+
+        mockMvc.perform(get("/api/v1/usuarios")
+                        .param("name", "João"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].name").value("João Silva"))
+                .andExpect(jsonPath("$[0].email").value("joao@email.com"))
+                .andExpect(jsonPath("$[0].login").value("joaosilva"))
+                .andExpect(jsonPath("$[0].address").value("Rua Teste, 123"))
+                .andExpect(jsonPath("$[0].type").value("CUSTOMER"));
+
+        verify(service).findByName("João");
+        verify(service, never()).findAll();
     }
 }
