@@ -54,6 +54,13 @@ public class UserService {
         return repository.findAll().stream().map(UserResponseDTO::fromEntity).toList();
     }
 
+    public List<UserResponseDTO> findByName(String name) {
+        return repository.findByNameContainingIgnoreCase(name)
+                .stream()
+                .map(UserResponseDTO::fromEntity)
+                .toList();
+    }
+
     public UserResponseDTO findById(Long id) {
         return repository.findById(id)
                 .map(UserResponseDTO::fromEntity)
