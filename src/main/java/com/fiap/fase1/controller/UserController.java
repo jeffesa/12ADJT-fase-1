@@ -38,19 +38,19 @@ public class UserController {
     }
 
     @Operation(
-        summary = "Criar usuário",
-        description = "Cadastra um novo usuário no sistema. Login e email devem ser únicos. A senha deve ter no mínimo 8 caracteres, incluindo letra maiúscula, minúscula e número."
+            summary = "Criar usuário",
+            description = "Cadastra um novo usuário no sistema. Login e email devem ser únicos. A senha deve ter no mínimo 8 caracteres, incluindo letra maiúscula, minúscula e número."
     )
     @RequestBody(
-        required = true,
-        content = @Content(
-            mediaType = MediaType.APPLICATION_JSON_VALUE,
-            schema = @Schema(implementation = UserRequestDTO.class),
-            examples = {
-                @ExampleObject(
-                    name = "Cliente",
-                    summary = "Cadastro de cliente",
-                    value = """
+            required = true,
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = UserRequestDTO.class),
+                    examples = {
+                            @ExampleObject(
+                                    name = "Cliente",
+                                    summary = "Cadastro de cliente",
+                                    value = """
                         {
                           "name": "João Silva",
                           "email": "joao.silva@email.com",
@@ -60,11 +60,11 @@ public class UserController {
                           "type": "CUSTOMER"
                         }
                         """
-                ),
-                @ExampleObject(
-                    name = "Dono de Restaurante",
-                    summary = "Cadastro de dono de restaurante",
-                    value = """
+                            ),
+                            @ExampleObject(
+                                    name = "Dono de Restaurante",
+                                    summary = "Cadastro de dono de restaurante",
+                                    value = """
                         {
                           "name": "Maria Oliveira",
                           "email": "maria.oliveira@restaurante.com",
@@ -74,204 +74,127 @@ public class UserController {
                           "type": "RESTAURANT_OWNER"
                         }
                         """
-                )
-            }
-        )
+                            )
+                    }
+            )
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados inválidos — verifique os campos obrigatórios e as regras de senha"),
-        @ApiResponse(responseCode = "409", description = "Email ou login já cadastrado")
+            @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "409", description = "Email ou login já cadastrado")
     })
     @PostMapping
-    public ResponseEntity<UserResponseDTO> create(@Valid @org.springframework.web.bind.annotation.RequestBody UserRequestDTO dto) {
+    public ResponseEntity<UserResponseDTO> create(
+            @Valid @org.springframework.web.bind.annotation.RequestBody UserRequestDTO dto) {
+
         UserResponseDTO response = service.create(dto);
+
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(response.id())
                 .toUri();
+
         return ResponseEntity.created(location).body(response);
     }
 
     @Operation(
-        summary = "Listar usuários ou buscar por nome",
-        description = "Retorna todos os usuários cadastrados. Se o parâmetro 'name' for informado, realiza busca parcial por nome (case-insensitive)."
+            summary = "Listar usuários ou buscar por nome",
+            description = "Retorna todos os usuários cadastrados. Se o parâmetro 'name' for informado, realiza busca parcial por nome sem diferenciar maiúsculas e minúsculas."
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
+            @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
     })
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> findAllOrSearchByName(
-            @Parameter(description = "Nome para busca parcial (case-insensitive)", example = "João")
+            @Parameter(
+                    description = "Nome para busca parcial",
+                    example = "João"
+            )
             @RequestParam(required = false) String name) {
+
         if (name != null && !name.isBlank()) {
             return ResponseEntity.ok(service.findByName(name));
         }
+
         return ResponseEntity.ok(service.findAll());
     }
 
-    @Operation(summary = "Buscar usuário por ID", description = "Retorna os dados de um usuário específico pelo seu ID.")
+    @Operation(
+            summary = "Buscar usuário por ID",
+            description = "Retorna os dados de um usuário específico pelo ID."
+    )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Usuário encontrado"),
-        @ApiResponse(responseCode = "404", description = "Usuário não encontrado para o ID informado")
+            @ApiResponse(responseCode = "200", description = "Usuário encontrado"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> findById(
             @Parameter(description = "ID do usuário", example = "1", required = true)
             @PathVariable Long id) {
+
         return ResponseEntity.ok(service.findById(id));
     }
 
     @Operation(
-        summary = "Atualizar usuário",
-        description = "Atualiza os dados de um usuário existente. Não é possível alterar a senha por este endpoint — use PATCH /{id}/password."
-    )
-    @RequestBody(
-        required = true,
-        content = @Content(
-            mediaType = MediaType.APPLICATION_JSON_VALUE,
-            schema = @Schema(implementation = UserUpdateDTO.class),
-            examples = @ExampleObject(
-                name = "Atualização de perfil",
-                value = """
-                    {
-                      "name": "João Silva Atualizado",
-                      "email": "joao.novo@email.com",
-                      "login": "joaosilva",
-                      "address": "Rua Nova, 456 - São Paulo/SP",
-                      "type": "CUSTOMER"
-                    }
-                    """
-            )
-        )
+            summary = "Atualizar usuário",
+            description = "Atualiza os dados de um usuário existente. Não altera senha."
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-        @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
-        @ApiResponse(responseCode = "409", description = "Email ou login já cadastrado por outro usuário")
+            @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
+            @ApiResponse(responseCode = "409", description = "Email ou login já cadastrado")
     })
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> update(
             @Parameter(description = "ID do usuário", example = "1", required = true)
             @PathVariable Long id,
             @Valid @org.springframework.web.bind.annotation.RequestBody UserUpdateDTO dto) {
+
         return ResponseEntity.ok(service.update(id, dto));
     }
 
-    @Operation(summary = "Deletar usuário", description = "Remove permanentemente um usuário pelo ID.")
+    @Operation(
+            summary = "Deletar usuário",
+            description = "Remove permanentemente um usuário pelo ID."
+    )
     @ApiResponses({
-        @ApiResponse(responseCode = "204", description = "Usuário deletado com sucesso"),
-        @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+            @ApiResponse(responseCode = "204", description = "Usuário deletado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @Parameter(description = "ID do usuário", example = "1", required = true)
             @PathVariable Long id) {
+
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(
-        summary = "Trocar senha",
-        description = "Altera a senha de um usuário. A nova senha deve ter no mínimo 8 caracteres, incluindo letra maiúscula, minúscula e número.",
-        tags = {"Autenticação"}
+            summary = "Trocar senha",
+            description = "Altera a senha do usuário.",
+            tags = {"Autenticação"}
     )
-    @RequestBody(
-        required = true,
-        content = @Content(
-            mediaType = MediaType.APPLICATION_JSON_VALUE,
-            schema = @Schema(implementation = ChangePasswordDTO.class),
-            examples = @ExampleObject(
-                name = "Troca de senha",
-                value = """
-                    {
-                      "currentPassword": "SenhaAtual123",
-                      "newPassword": "NovaSenha456"
-                    }
-                    """
-            )
-        )
-    )
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            description = "Senha alterada com sucesso",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                examples = @ExampleObject(value = "{\"mensagem\": \"Senha alterada com sucesso\"}")
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Senha atual incorreta ou nova senha não atende aos requisitos",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                examples = @ExampleObject(value = """
-                    {
-                      "type": "https://api.fiap.com/errors/bad-request",
-                      "title": "Requisição inválida",
-                      "status": 400,
-                      "detail": "Senha atual incorreta",
-                      "instance": "/api/v1/usuarios/1/password"
-                    }
-                    """)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Usuário não encontrado",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                examples = @ExampleObject(value = """
-                    {
-                      "type": "https://api.fiap.com/errors/not-found",
-                      "title": "Usuário não encontrado",
-                      "status": 404,
-                      "detail": "Usuário não encontrado com id: 1",
-                      "instance": "/api/v1/usuarios/1/password"
-                    }
-                    """)
-            )
-        )
-    })
     @PatchMapping("/{id}/password")
     public ResponseEntity<Map<String, String>> changePassword(
-            @Parameter(description = "ID do usuário", example = "1", required = true)
             @PathVariable Long id,
             @Valid @org.springframework.web.bind.annotation.RequestBody ChangePasswordDTO dto) {
+
         service.changePassword(id, dto);
         return ResponseEntity.ok(Map.of("mensagem", "Senha alterada com sucesso"));
     }
 
     @Operation(
-        summary = "Login",
-        description = "Valida as credenciais do usuário e retorna os dados da sessão.",
-        tags = {"Autenticação"}
+            summary = "Login",
+            description = "Valida login e senha.",
+            tags = {"Autenticação"}
     )
-    @RequestBody(
-        required = true,
-        content = @Content(
-            mediaType = MediaType.APPLICATION_JSON_VALUE,
-            schema = @Schema(implementation = LoginRequestDTO.class),
-            examples = @ExampleObject(
-                name = "Login",
-                value = """
-                    {
-                      "login": "joaosilva",
-                      "password": "Senha123"
-                    }
-                    """
-            )
-        )
-    )
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Login realizado com sucesso"),
-        @ApiResponse(responseCode = "401", description = "Login ou senha inválidos")
-    })
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@Valid @org.springframework.web.bind.annotation.RequestBody LoginRequestDTO dto) {
+    public ResponseEntity<LoginResponseDTO> login(
+            @Valid @org.springframework.web.bind.annotation.RequestBody LoginRequestDTO dto) {
+
         return ResponseEntity.ok(service.login(dto));
     }
 }

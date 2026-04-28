@@ -17,7 +17,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check for differences
+        id: diff-check
+        run: |
+          DIFF=$(git diff origin/main..origin/develop --stat)
+          if [ -z "$DIFF" ]; then
+            echo "develop e main são idênticas. Nenhum PR necessário."
+            echo "has_diff=false" >> $GITHUB_OUTPUT
+          else
+            echo "Diferenças encontradas entre develop e main."
+            echo "has_diff=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create Pull Request to main
+        if: steps.diff-check.outputs.has_diff == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
