@@ -1,9 +1,8 @@
 package com.fiap.fase1.controller;
 
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
-import com.fiap.fase1.model.UserType;
-import java.time.LocalDateTime;
+import static org.mockito.Mockito.verify;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.fase1.model.UserType;
 import com.fiap.fase1.dto.ChangePasswordDTO;
