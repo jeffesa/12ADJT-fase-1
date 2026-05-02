@@ -4,6 +4,12 @@
 
 Sistema de gerenciamento de usuários desenvolvido com Spring Boot para o Tech Challenge - Fase 1 da FIAP.
 
+> 🌐 **Aplicação em produção:** [https://one2adjt-fase-1.onrender.com](https://one2adjt-fase-1.onrender.com)
+>
+> 📖 **Swagger UI:** [https://one2adjt-fase-1.onrender.com/swagger-ui.html](https://one2adjt-fase-1.onrender.com/swagger-ui.html)
+>
+> 📬 **Collection Postman:** [`docs/api-collection/fiap-fase1-usuarios.json`](docs/api-collection/fiap-fase1-usuarios.json) — [Como importar](docs/api-collection/README.md)
+
 ---
 
 ## 📋 Sobre o Projeto
@@ -15,6 +21,8 @@ API RESTful para gerenciamento de usuários com funcionalidades de:
 -   ✅ Exclusão de usuários
 -   ✅ Validação de login
 -   ✅ Listagem de usuários
+-   ✅ Busca por nome (parcial, case-insensitive)
+-   ✅ Troca de senha
 
 ---
 
@@ -524,6 +532,12 @@ Listar todos
 
 GET
 
+`/api/v1/usuarios?name={nome}`
+
+Buscar por nome (parcial, case-insensitive)
+
+GET
+
 `/api/v1/usuarios/{id}`
 
 Buscar por ID
@@ -545,6 +559,12 @@ POST
 `/api/v1/usuarios/login`
 
 Validar login
+
+PATCH
+
+`/api/v1/usuarios/{id}/password`
+
+Trocar senha
 
 ### Health Check
 
@@ -615,11 +635,13 @@ O projeto utiliza GitHub Actions para:
 
 ### Produção (Render.com)
 
-A aplicação está deployada em:
+A aplicação está deployada e acessível publicamente em:
 
-```
-https://one2adjt-fase-1.onrender.com
-```
+| Recurso | URL |
+|---|---|
+| **API Base** | [https://one2adjt-fase-1.onrender.com](https://one2adjt-fase-1.onrender.com) |
+| **Swagger UI** | [https://one2adjt-fase-1.onrender.com/swagger-ui.html](https://one2adjt-fase-1.onrender.com/swagger-ui.html) |
+| **Health Check** | [https://one2adjt-fase-1.onrender.com/actuator/health](https://one2adjt-fase-1.onrender.com/actuator/health) |
 
 > ⚠️ **Observação:** O primeiro acesso após inatividade pode demorar 50 segundos ou mais, pois a instância gratuita do Render entra em modo de espera. Após o primeiro request, a velocidade é normal.
 
@@ -668,4 +690,4 @@ Este projeto foi desenvolvido para fins educacionais - FIAP Tech Challenge.
 
 **Desenvolvido com ❤️ para o Tech Challenge FIAP**
 
-<!-- Última atualização: 2026-04-23 -->
+<!-- Última atualização: 2026-05-02 -->

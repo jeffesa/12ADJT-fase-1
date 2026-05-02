@@ -25,6 +25,10 @@ Bem-vindo à documentação completa do projeto!
 - **[RENDER_DEPLOY_GUIDE.md](deploy/RENDER_DEPLOY_GUIDE.md)** - Guia completo de deploy no Render.com
 - **[ATUALIZACOES_RENDER.md](deploy/ATUALIZACOES_RENDER.md)** - Resumo das atualizações para incluir Render.com
 
+### 📬 API Collection
+- **[README.md](api-collection/README.md)** - Documentação da collection Postman (como importar e usar)
+- **[fiap-fase1-usuarios.json](api-collection/fiap-fase1-usuarios.json)** - Collection Postman com 50 requests (sucesso + erro)
+
 ---
 
 ## 🚀 Quick Start
