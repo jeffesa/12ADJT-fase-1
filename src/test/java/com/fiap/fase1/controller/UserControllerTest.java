@@ -1,18 +1,18 @@
 package com.fiap.fase1.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fiap.fase1.model.UserType;
+import com.fiap.fase1.config.SecurityConfig;
 import com.fiap.fase1.dto.ChangePasswordDTO;
 import com.fiap.fase1.dto.LoginRequestDTO;
 import com.fiap.fase1.dto.LoginResponseDTO;
 import com.fiap.fase1.dto.UserRequestDTO;
 import com.fiap.fase1.dto.UserResponseDTO;
 import com.fiap.fase1.dto.UserUpdateDTO;
-import com.fiap.fase1.exception.InvalidCredentialsException;
 import com.fiap.fase1.exception.EmailAlreadyExistsException;
+import com.fiap.fase1.exception.InvalidCredentialsException;
 import com.fiap.fase1.exception.LoginAlreadyExistsException;
 import com.fiap.fase1.exception.UserNotFoundException;
-import org.springframework.dao.DataIntegrityViolationException;
+import com.fiap.fase1.model.UserType;
 import com.fiap.fase1.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -28,14 +30,17 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-
-import com.fiap.fase1.config.SecurityConfig;
-import org.springframework.context.annotation.Import;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
 @Import(SecurityConfig.class)
@@ -57,10 +62,40 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        responseDTO = new UserResponseDTO(1L, "João Silva", "joao@email.com", "joaosilva", "Rua A, 123", UserType.CUSTOMER, LocalDateTime.now());
-        requestDTO = new UserRequestDTO("João Silva", "joao@email.com", "joaosilva", "Senha123", "Rua A, 123", UserType.CUSTOMER);
-        updateDTO = new UserUpdateDTO("João Silva", "joao@email.com", "joaosilva", "Rua A, 123", UserType.CUSTOMER);
-        loginResponseDTO = new LoginResponseDTO("Login realizado com sucesso", 1L, "joaosilva", "joao@email.com", LocalDateTime.now());
+        responseDTO = new UserResponseDTO(
+                1L,
+                "João Silva",
+                "joao@email.com",
+                "joaosilva",
+                "Rua A, 123",
+                UserType.CUSTOMER,
+                LocalDateTime.now()
+        );
+
+        requestDTO = new UserRequestDTO(
+                "João Silva",
+                "joao@email.com",
+                "joaosilva",
+                "Senha123",
+                "Rua A, 123",
+                UserType.CUSTOMER
+        );
+
+        updateDTO = new UserUpdateDTO(
+                "João Silva",
+                "joao@email.com",
+                "joaosilva",
+                "Rua A, 123",
+                UserType.CUSTOMER
+        );
+
+        loginResponseDTO = new LoginResponseDTO(
+                "Login realizado com sucesso",
+                1L,
+                "joaosilva",
+                "joao@email.com",
+                LocalDateTime.now()
+        );
     }
 
     @Test
@@ -96,7 +131,14 @@ class UserControllerTest {
     @Test
     @DisplayName("POST /api/v1/usuarios - deve retornar 400 com dados inválidos")
     void shouldReturn400InvalidData() throws Exception {
-        UserRequestDTO invalid = new UserRequestDTO("", "email-invalido", "login", "123", "Rua A, 123", UserType.CUSTOMER);
+        UserRequestDTO invalid = new UserRequestDTO(
+                "",
+                "email-invalido",
+                "login",
+                "123",
+                "Rua A, 123",
+                UserType.CUSTOMER
+        );
 
         mockMvc.perform(post("/api/v1/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -113,11 +155,36 @@ class UserControllerTest {
     @Test
     @DisplayName("GET /api/v1/usuarios - deve listar usuários e retornar 200")
     void shouldListUsers() throws Exception {
-        when(service.findAll()).thenReturn(List.of(responseDTO));
+        when(service.findAll(isNull())).thenReturn(List.of(responseDTO));
 
         mockMvc.perform(get("/api/v1/usuarios"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].email").value("joao@email.com"));
+                .andExpect(jsonPath("$[0].email").value("joao@email.com"))
+                .andExpect(jsonPath("$[0].name").value("João Silva"));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/usuarios?name=João - deve filtrar usuários por nome")
+    void shouldListUsersFilteredByName() throws Exception {
+        when(service.findAll("João")).thenReturn(List.of(responseDTO));
+
+        mockMvc.perform(get("/api/v1/usuarios")
+                        .param("name", "João"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].email").value("joao@email.com"))
+                .andExpect(jsonPath("$[0].name").value("João Silva"));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/usuarios?name=inexistente - deve retornar lista vazia")
+    void shouldReturnEmptyListWhenNameNotFound() throws Exception {
+        when(service.findAll("zzz_nao_existe_zzz")).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/v1/usuarios")
+                        .param("name", "zzz_nao_existe_zzz"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
     }
 
     @Test
@@ -291,7 +358,7 @@ class UserControllerTest {
     @Test
     @DisplayName("GET /api/v1/usuarios - deve retornar lista vazia")
     void shouldReturnEmptyList() throws Exception {
-        when(service.findAll()).thenReturn(List.of());
+        when(service.findAll(isNull())).thenReturn(List.of());
 
         mockMvc.perform(get("/api/v1/usuarios"))
                 .andExpect(status().isOk())
@@ -330,7 +397,13 @@ class UserControllerTest {
     @Test
     @DisplayName("PUT /api/v1/usuarios/{id} - deve retornar 400 com dados inválidos")
     void shouldReturn400UpdateInvalidData() throws Exception {
-        UserUpdateDTO invalid = new UserUpdateDTO("", "email-invalido", "login", "Rua A", UserType.CUSTOMER);
+        UserUpdateDTO invalid = new UserUpdateDTO(
+                "",
+                "email-invalido",
+                "login",
+                "Rua A",
+                UserType.CUSTOMER
+        );
 
         mockMvc.perform(put("/api/v1/usuarios/1")
                         .contentType(MediaType.APPLICATION_JSON)

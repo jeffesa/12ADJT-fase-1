@@ -94,11 +94,17 @@ public class UserController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @Operation(summary = "Listar usuários", description = "Retorna a lista completa de todos os usuários cadastrados no sistema.")
+    @Operation(
+            summary = "Listar usuários",
+            description = "Retorna todos os usuários cadastrados ou filtra pelo nome quando o parâmetro name é informado."
+    )
     @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
     @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<List<UserResponseDTO>> findAll(
+            @Parameter(description = "Filtro opcional por nome do usuário", example = "João")
+            @RequestParam(name = "name", required = false) String name
+    ) {
+        return ResponseEntity.ok(service.findAll(name));
     }
 
     @Operation(summary = "Buscar usuário por ID", description = "Retorna os dados de um usuário específico pelo seu ID.")
