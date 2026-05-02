@@ -21,6 +21,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -329,5 +333,74 @@ class UserServiceTest {
         when(repository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class, () -> service.changePassword(99L, dto));
+    }
+
+    @Test
+    @DisplayName("Deve listar todos os usuários quando filtro por nome for nulo")
+    void shouldListAllUsersWhenNameIsNull() {
+        when(repository.findAll()).thenReturn(List.of(user));
+
+        List<UserResponseDTO> list = service.findAll(null);
+
+        assertEquals(1, list.size());
+        assertEquals("joao@email.com", list.get(0).email());
+
+        verify(repository).findAll();
+        verify(repository, never()).findByNameContainingIgnoreCase(anyString());
+    }
+
+    @Test
+    @DisplayName("Deve listar todos os usuários quando filtro por nome estiver vazio")
+    void shouldListAllUsersWhenNameIsBlank() {
+        when(repository.findAll()).thenReturn(List.of(user));
+
+        List<UserResponseDTO> list = service.findAll("   ");
+
+        assertEquals(1, list.size());
+        assertEquals("joao@email.com", list.get(0).email());
+
+        verify(repository).findAll();
+        verify(repository, never()).findByNameContainingIgnoreCase(anyString());
+    }
+
+    @Test
+    @DisplayName("Deve buscar usuários por nome quando filtro for informado")
+    void shouldFindUsersByNameWhenNameIsProvided() {
+        when(repository.findByNameContainingIgnoreCase("João")).thenReturn(List.of(user));
+
+        List<UserResponseDTO> list = service.findAll("João");
+
+        assertEquals(1, list.size());
+        assertEquals("joao@email.com", list.get(0).email());
+
+        verify(repository).findByNameContainingIgnoreCase("João");
+        verify(repository, never()).findAll();
+    }
+
+    @Test
+    @DisplayName("Deve remover espaços do filtro antes de buscar por nome")
+    void shouldTrimNameBeforeSearching() {
+        when(repository.findByNameContainingIgnoreCase("João")).thenReturn(List.of(user));
+
+        List<UserResponseDTO> list = service.findAll("  João  ");
+
+        assertEquals(1, list.size());
+        assertEquals("joao@email.com", list.get(0).email());
+
+        verify(repository).findByNameContainingIgnoreCase("João");
+        verify(repository, never()).findAll();
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia quando nome não for encontrado")
+    void shouldReturnEmptyListWhenNameIsNotFound() {
+        when(repository.findByNameContainingIgnoreCase("zzz_nao_existe_zzz")).thenReturn(List.of());
+
+        List<UserResponseDTO> list = service.findAll("zzz_nao_existe_zzz");
+
+        assertTrue(list.isEmpty());
+
+        verify(repository).findByNameContainingIgnoreCase("zzz_nao_existe_zzz");
+        verify(repository, never()).findAll();
     }
 }
