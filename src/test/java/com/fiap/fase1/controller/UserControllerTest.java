@@ -2,12 +2,7 @@ package com.fiap.fase1.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.fase1.config.SecurityConfig;
-import com.fiap.fase1.dto.ChangePasswordDTO;
-import com.fiap.fase1.dto.LoginRequestDTO;
-import com.fiap.fase1.dto.LoginResponseDTO;
-import com.fiap.fase1.dto.UserRequestDTO;
-import com.fiap.fase1.dto.UserResponseDTO;
-import com.fiap.fase1.dto.UserUpdateDTO;
+import com.fiap.fase1.dto.*;
 import com.fiap.fase1.exception.EmailAlreadyExistsException;
 import com.fiap.fase1.exception.InvalidCredentialsException;
 import com.fiap.fase1.exception.LoginAlreadyExistsException;
@@ -28,19 +23,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UserController.class)
 @Import(SecurityConfig.class)
@@ -438,5 +424,34 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.type").value("https://api.fiap.com/errors/conflict"))
                 .andExpect(jsonPath("$.title").value("Login já cadastrado"))
                 .andExpect(jsonPath("$.status").value(409));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/usuarios?name=João - deve buscar usuários por nome e retornar 200")
+    void shouldSearchUsersByNameAndReturn200() throws Exception {
+        UserResponseDTO response = new UserResponseDTO(
+                1L,
+                "João Silva",
+                "joao@email.com",
+                "joaosilva",
+                "Rua Teste, 123",
+                UserType.CUSTOMER,
+                LocalDateTime.now()
+        );
+
+        when(service.findAll("João")).thenReturn(List.of(responseDTO));
+
+        mockMvc.perform(get("/api/v1/usuarios")
+                        .param("name", "João"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].name").value("João Silva"))
+                .andExpect(jsonPath("$[0].email").value("joao@email.com"))
+                .andExpect(jsonPath("$[0].login").value("joaosilva"))
+                .andExpect(jsonPath("$[0].address").value("Rua A, 123"))
+                .andExpect(jsonPath("$[0].type").value("CUSTOMER"));
+
+        verify(service).findAll("João");
+        verify(service, never()).findAll();
     }
 }

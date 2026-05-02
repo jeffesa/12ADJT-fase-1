@@ -95,15 +95,20 @@ public class UserController {
     }
 
     @Operation(
-            summary = "Listar usuários",
-            description = "Retorna todos os usuários cadastrados ou filtra pelo nome quando o parâmetro name é informado."
+            summary = "Listar usuários ou buscar por nome",
+            description = "Retorna todos os usuários cadastrados. Se o parâmetro 'name' for informado, realiza busca parcial por nome sem diferenciar maiúsculas e minúsculas."
     )
-    @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
+    })
     @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> findAll(
-            @Parameter(description = "Filtro opcional por nome do usuário", example = "João")
-            @RequestParam(name = "name", required = false) String name
-    ) {
+    public ResponseEntity<List<UserResponseDTO>> findAllOrSearchByName(
+            @Parameter(
+                    description = "Nome para busca parcial",
+                    example = "João"
+            )
+            @RequestParam(name = "name", required = false) String name) {
+
         return ResponseEntity.ok(service.findAll(name));
     }
 

@@ -121,6 +121,35 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Deve buscar usuários por nome ignorando maiúsculas e minúsculas")
+    void shouldFindUsersByNameIgnoringCase() {
+        when(repository.findByNameContainingIgnoreCase("JO"))
+                .thenReturn(List.of(user));
+
+        List<UserResponseDTO> result = service.findByName("JO");
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("João Silva", result.get(0).name());
+
+        verify(repository).findByNameContainingIgnoreCase("JO");
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia ao buscar nome inexistente")
+    void shouldReturnEmptyListWhenNameNotFound() {
+        when(repository.findByNameContainingIgnoreCase("xxxxx"))
+                .thenReturn(List.of());
+
+        List<UserResponseDTO> result = service.findByName("xxxxx");
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(repository).findByNameContainingIgnoreCase("xxxxx");
+    }
+
+    @Test
     @DisplayName("Deve buscar usuário por ID com sucesso")
     void shouldFindById() {
         when(repository.findById(1L)).thenReturn(Optional.of(user));
