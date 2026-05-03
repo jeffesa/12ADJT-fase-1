@@ -1,0 +1,102 @@
+/* ── Tela ── */
+body {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 12pt;
+  line-height: 1.5;
+  color: #000;
+  max-width: 21cm;
+  margin: 0 auto;
+  padding: 3cm 2cm 2cm 3cm;
+  text-align: justify;
+}
+
+/* Capa e folha de rosto centralizadas */
+div[align="center"] {
+  text-align: center;
+}
+
+h1, h2, h3, h4 {
+  text-align: left;
+  font-family: "Times New Roman", Times, serif;
+  font-weight: bold;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+h1 { font-size: 14pt; text-transform: uppercase; }
+h2 { font-size: 13pt; text-transform: uppercase; }
+h3 { font-size: 12pt; }
+h4 { font-size: 12pt; font-style: italic; font-weight: bold; }
+
+p { margin: 0.5em 0; }
+
+hr {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 2em 0;
+}
+
+pre, code {
+  font-family: "Courier New", monospace;
+  font-size: 10pt;
+  background: #f7f7f7;
+  border-radius: 3px;
+}
+
+pre {
+  padding: 1em;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+code { padding: 0.1em 0.3em; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  font-size: 11pt;
+}
+
+th {
+  background: #2d2d2d;
+  color: #fff;
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: normal;
+}
+
+td {
+  padding: 7px 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+tr:nth-child(even) td { background: #fafafa; }
+
+ul, ol { margin: 0.5em 0; padding-left: 1.5em; }
+li { margin: 0.3em 0; }
+
+/* ── Impressão / PDF ── */
+@page {
+  size: A4;
+  margin-top: 3cm;
+  margin-left: 3cm;
+  margin-bottom: 2cm;
+  margin-right: 2cm;
+  @bottom-center {
+    content: counter(page);
+    font-family: "Times New Roman", Times, serif;
+    font-size: 10pt;
+  }
+}
+
+/* Capa: conta como página 1 mas não exibe número */
+@page :first {
+  @bottom-center { content: none; }
+}
+
+@media print {
+  body { padding: 0; margin: 0; }
+  pre { white-space: pre-wrap; word-break: break-word; }
+  hr { page-break-after: always; border: none; }
+}
