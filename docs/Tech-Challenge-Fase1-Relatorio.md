@@ -34,34 +34,6 @@ São Paulo
 
 ---
 
-<!-- ============================================================ -->
-<!-- FOLHA DE ROSTO (opcional, mas recomendada pela ABNT)         -->
-<!-- ============================================================ -->
-
-<div align="center">
-
-Jefferson Ricardo dos Santos
-
-<br><br><br><br>
-
-**SISTEMA DE GERENCIAMENTO DE USUÁRIOS PARA RESTAURANTES: DESENVOLVIMENTO DE API RESTFUL COM SPRING BOOT**
-
-<br><br>
-
-Trabalho apresentado à FIAP - Faculdade de Informática e Administração Paulista, como parte dos requisitos para aprovação na disciplina Tech Challenge — Fase 1 do curso de Pós-Graduação em Arquitetura e Desenvolvimento Java.
-
-<br><br><br><br><br><br><br><br>
-
-São Paulo
-
-2026
-
-</div>
-
-<!-- Inserir quebra de página no Word -->
-
----
-
 ## RESUMO
 
 Este trabalho apresenta o desenvolvimento de uma API RESTful para gerenciamento de usuários, construída como parte do Tech Challenge — Fase 1 do curso de Pós-Graduação em Arquitetura e Desenvolvimento Java da FIAP. O sistema foi projetado para atender a um grupo de restaurantes que necessitam de uma plataforma compartilhada de gestão, permitindo o cadastro, atualização, exclusão e autenticação de dois tipos de usuários: donos de restaurante e clientes. A aplicação foi desenvolvida utilizando Java 17 e Spring Boot 3.2.3, seguindo uma arquitetura em camadas com padrões de projeto como DTO Pattern, Repository Pattern e Service Layer. O tratamento de erros segue o padrão ProblemDetail (RFC 7807), e a segurança das senhas é garantida pelo algoritmo BCrypt. A persistência de dados utiliza PostgreSQL como banco relacional, e toda a infraestrutura é orquestrada via Docker Compose. O projeto conta com mais de 100 testes automatizados (JUnit 5 + Mockito), documentação interativa via Swagger/OpenAPI e coleção Postman com 50 cenários de teste. Como funcionalidades extras, além do escopo obrigatório, foram implementados: testes unitários e de integração automatizados, deploy em produção no Render.com e CI/CD com GitHub Actions.
